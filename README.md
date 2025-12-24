@@ -1,19 +1,18 @@
 # PreuveTierce
 
-**PreuveTierce** is a lightweight digital integrity and timestamping service designed to act as a neutral third party for document evidence.
+**PreuveTierce** is a high-performance, lightweight digital evidence service designed to act as a neutral Technical Witness for document integrity.
 
-The service allows users to generate cryptographic fingerprints (hashes) of documents and obtain a verifiable timestamp, without uploading or storing the original files.
-
+In an era where digital tampering is effortless, PreuveTierce provides a cryptographically secure method to prove that a document existed in a specific state at a specific point in time without ever compromising user privacy.
 ---
 
-## 🔐 Concept
+## 🔐 The "Zero-Knowledge" Concept
 
-In many legal and contractual contexts, a common dispute is whether a digital document has been altered after acceptance.
+PreuveTierce solves the "Trust Gap" in digital transactions. We don't ask you to trust us with your files; we ask you to trust the mathematics of cryptography.
 
 PreuveTierce provides:
-- Proof of **existence**
-- Proof of **integrity**
-- Proof of **timestamp**
+- Proof of **existence:** Prove a file existed at a specific UTC second
+- Proof of **integrity:** Ensure not a single pixel or character has changed since timestamping.
+- Proof of **Zero-Storage Policy:** Your documents never leave your local environment. Only the 64-character SHA-256 hash (fingerprint) is transmitted to our vault.
 
 By recording only the document hash, PreuveTierce never stores the document itself.
 
@@ -42,12 +41,12 @@ By recording only the document hash, PreuveTierce never stores the document itse
 - **Database**: SQLite
 - **Web Server**: Nginx (reverse proxy)
 - **OS**: Ubuntu 22.04 LTS
-- **TLS**: Let's Encrypt
+- **TLS**: Let's Encrypt TLS with A+ Security Rating.
 - **Hash Algorithm**: SHA-256
 
 ---
 
-## 📦 Data Privacy
+## 📦 Privacy by Design (GDPR+)
 
 - No document files are stored.
 - Only cryptographic hashes and metadata are recorded.
@@ -59,7 +58,7 @@ By recording only the document hash, PreuveTierce never stores the document itse
 
 ## 🛡️ Legal Disclaimer
 
-PreuveTierce provides **technical evidence**, not legal certification.
+[!IMPORTANT] PreuveTierce provides **technical evidence**, While built on international standards (similar to RFC 3161), it is currently a private technical service and not a "Qualified Trust Service Provider" (QTSP) under eIDAS.
 
 The legal value of the generated proof depends on:
 - Jurisdiction

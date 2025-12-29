@@ -1,0 +1,83 @@
+﻿@page
+@model EmailModel
+@{
+    Layout = "_ManageLayout";
+    ViewData["Title"] = "Adresse e-mail";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<section class="space-y-6">
+
+    <header>
+        <h1 class="text-xl font-semibold text-primary">
+            Adresse e-mail
+        </h1>
+        <p class="text-sm text-gray-600">
+            Gérez l’adresse e-mail associée à votre compte.
+        </p>
+    </header>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <form id="email-form" method="post" class="space-y-6 max-w-md">
+
+        <div asp-validation-summary="All"
+             class="text-error text-sm font-medium"></div>
+
+        <!-- EMAIL ACTUEL -->
+        <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">
+                Adresse e-mail actuelle
+            </label>
+
+            <div class="relative">
+                <input asp-for="Email"
+                       disabled
+                       class="w-full rounded border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-700" />
+
+                @if (Model.IsEmailConfirmed)
+                {
+                    <span class="absolute inset-y-0 right-3 flex items-center text-success font-semibold">
+                        ✓
+                    </span>
+                }
+            </div>
+
+            @if (!Model.IsEmailConfirmed)
+            {
+                <button type="submit"
+                        asp-page-handler="SendVerificationEmail"
+                        class="text-sm text-primary hover:underline mt-1">
+                    Renvoyer l’e-mail de confirmation
+                </button>
+            }
+        </div>
+
+        <!-- NOUVEL EMAIL -->
+        <div class="space-y-1">
+            <label asp-for="Input.NewEmail"
+                   class="block text-sm font-medium text-gray-700">
+                Nouvelle adresse e-mail
+            </label>
+
+            <input asp-for="Input.NewEmail"
+                   autocomplete="email"
+                   class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary" />
+
+            <span asp-validation-for="Input.NewEmail"
+                  class="text-error text-sm"></span>
+        </div>
+
+        <!-- ACTION -->
+        <button type="submit"
+                asp-page-handler="ChangeEmail"
+                class="bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary/90 transition">
+            Mettre à jour l’adresse e-mail
+        </button>
+
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

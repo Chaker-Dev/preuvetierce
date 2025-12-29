@@ -1,0 +1,35 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Confirmation d’inscription";
+}
+
+<div class="min-h-screen flex items-center justify-center bg-soft px-4">
+    <div class="max-w-md w-full bg-white p-8 rounded-lg card-shadow text-center space-y-4">
+
+        <h1 class="text-2xl font-semibold text-primary">
+            Confirmation du compte
+        </h1>
+
+        @if (Model.DisplayConfirmAccountLink)
+        {
+            <p class="text-gray-700 text-sm">
+                ⚠️ Aucun service d’envoi d’email n’est configuré.
+            </p>
+
+            <a id="confirm-link"
+               href="@Model.EmailConfirmationUrl"
+               class="inline-block mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition text-sm font-medium">
+                Confirmer mon compte
+            </a>
+        }
+        else
+        {
+            <p class="text-gray-700">
+                Un email de confirmation vous a été envoyé.
+                <br />
+                Merci de vérifier votre boîte mail.
+            </p>
+        }
+    </div>
+</div>

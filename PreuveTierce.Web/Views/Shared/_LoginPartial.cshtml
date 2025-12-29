@@ -1,0 +1,42 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using PreuveTierce.Web.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="flex items-center gap-4 text-sm">
+    @if (SignInManager.IsSignedIn(User))
+    {
+
+        <a asp-area="Identity"
+           asp-page="/Account/Manage/Index"
+           class="text-primary hover:underline transition">
+            Mon compte
+        </a>
+
+        <form asp-area="Identity"
+              asp-page="/Account/Logout"
+              asp-route-returnUrl="@Url.Action("Index", "Home")"
+              method="post">
+            <button type="submit"
+                    class="bg-primary text-white px-4 py-2 rounded-md shadow-sm hover:bg-opacity-90 transition">
+                Déconnexion
+            </button>
+        </form>
+    }
+    else
+    {
+        <!-- Visiteur -->
+        <a asp-area="Identity"
+           asp-page="/Account/Login"
+           class="text-primary font-medium hover:underline transition">
+            Connexion
+        </a>
+
+        <a asp-area="Identity"
+           asp-page="/Account/Register"
+           class="bg-primary text-white px-4 py-2 rounded-md shadow-sm hover:bg-opacity-90 transition">
+            Créer un compte
+        </a>
+    }
+</div>

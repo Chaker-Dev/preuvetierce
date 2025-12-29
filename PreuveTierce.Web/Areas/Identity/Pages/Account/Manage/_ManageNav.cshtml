@@ -1,0 +1,12 @@
+﻿@inject SignInManager<ApplicationUser> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+<nav class="flex flex-col space-y-2 h-full"> <h2 class="text-lg font-semibold text-primary mb-4"> Mon compte </h2>
+<a asp-page="./Index" class="px-4 py-2 rounded transition @(ManageNavPages.IndexNavClass(ViewContext) == "active" ? "bg-primary text-white" : "text-gray-700 hover:bg-gray-100")"> Profil </a>
+ <a asp-page="./Email" class="px-4 py-2 rounded transition @(ManageNavPages.EmailNavClass(ViewContext) == "active" ? "bg-primary text-white" : "text-gray-700 hover:bg-gray-100")"> Email </a> 
+ <a asp-page="./ChangePassword" class="px-4 py-2 rounded transition @(ManageNavPages.ChangePasswordNavClass(ViewContext) == "active" ? "bg-primary text-white" : "text-gray-700 hover:bg-gray-100")"> Mot de passe </a> @if (hasExternalLogins) {
+<a asp-page="./ExternalLogins" class="px-4 py-2 rounded transition @(ManageNavPages.ExternalLoginsNavClass(ViewContext) == "active" ? "bg-primary text-white" : "text-gray-700 hover:bg-gray-100")"> Connexions externes </a>}
+ <a asp-page="./TwoFactorAuthentication" class="px-4 py-2 rounded transition @(ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext) == "active" ? "bg-primary text-white" : "text-gray-700 hover:bg-gray-100")"> Sécurité </a>
+ <a asp-page="./PersonalData" class="px-4 py-2 rounded transition @(ManageNavPages.PersonalDataNavClass(ViewContext) == "active" ? "bg-primary text-white" : "text-gray-700 hover:bg-gray-100")"> Données personnelles </a> 
+</nav>

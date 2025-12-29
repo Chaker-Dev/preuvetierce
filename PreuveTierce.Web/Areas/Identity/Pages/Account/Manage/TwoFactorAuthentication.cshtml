@@ -1,0 +1,146 @@
+﻿@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+@{
+    Layout = "_ManageLayout";
+    ViewData["Title"] = "Sécurité (double authentification)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<section class="space-y-8">
+
+    <header>
+        <h1 class="text-xl font-semibold text-primary">
+            Sécurité du compte
+        </h1>
+        <p class="text-sm text-gray-600">
+            Renforcez la sécurité de votre compte avec la double authentification (2FA).
+        </p>
+    </header>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    @{
+        var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+    }
+
+    @if (consentFeature?.CanTrack ?? true)
+    {
+        @* ====== ALERTES CODES DE SECOURS ====== *@
+        @if (Model.Is2faEnabled)
+        {
+            if (Model.RecoveryCodesLeft == 0)
+            {
+                <div class="bg-error/10 border border-error text-error p-4 rounded text-sm">
+                    <strong class="block font-semibold">
+                        Aucun code de secours restant.
+                    </strong>
+                    <p>
+                        Vous devez
+                        <a asp-page="./GenerateRecoveryCodes" class="underline font-medium">
+                            générer de nouveaux codes de secours
+                        </a>
+                        avant de pouvoir vous connecter avec un code.
+                    </p>
+                </div>
+            }
+            else if (Model.RecoveryCodesLeft <= 3)
+            {
+                <div class="bg-yellow-50 border border-yellow-400 text-yellow-800 p-4 rounded text-sm">
+                    <strong class="block font-semibold">
+                        Il vous reste @Model.RecoveryCodesLeft code(s) de secours.
+                    </strong>
+                    <p>
+                        Nous vous recommandons de
+                        <a asp-page="./GenerateRecoveryCodes" class="underline font-medium">
+                            générer de nouveaux codes
+                        </a>.
+                    </p>
+                </div>
+            }
+        }
+
+        @* ====== ACTIONS 2FA ====== *@
+        <div class="space-y-4">
+
+            @if (Model.Is2faEnabled)
+            {
+                <div class="flex flex-wrap gap-3">
+
+                    @if (Model.IsMachineRemembered)
+                    {
+                        <form method="post">
+                            <button type="submit"
+                                    class="px-4 py-2 rounded text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 transition">
+                                Oublier ce navigateur
+                            </button>
+                        </form>
+                    }
+
+                    <a asp-page="./Disable2fa"
+                       class="px-4 py-2 rounded text-sm font-medium bg-error text-white hover:bg-error/90 transition">
+                        Désactiver la double authentification
+                    </a>
+
+                    <a asp-page="./GenerateRecoveryCodes"
+                       class="px-4 py-2 rounded text-sm font-medium bg-primary text-white hover:bg-primary/90 transition">
+                        Générer de nouveaux codes de secours
+                    </a>
+                </div>
+            }
+        </div>
+
+        @* ====== AUTHENTICATOR APP ====== *@
+        <div class="border-t pt-6 space-y-4">
+
+            <h2 class="text-lg font-semibold text-gray-800">
+                Application d’authentification
+            </h2>
+
+            <p class="text-sm text-gray-600 max-w-xl">
+                Une application d’authentification (Google Authenticator, Microsoft Authenticator, etc.)
+                génère un code temporaire à chaque connexion.
+            </p>
+
+            <div class="flex flex-wrap gap-3">
+
+                @if (!Model.HasAuthenticator)
+                {
+                    <a asp-page="./EnableAuthenticator"
+                       class="px-4 py-2 rounded text-sm font-medium bg-primary text-white hover:bg-primary/90 transition">
+                        Ajouter une application d’authentification
+                    </a>
+                }
+                else
+                {
+                    <a asp-page="./EnableAuthenticator"
+                       class="px-4 py-2 rounded text-sm font-medium bg-primary text-white hover:bg-primary/90 transition">
+                        Configurer l’application d’authentification
+                    </a>
+
+                    <a asp-page="./ResetAuthenticator"
+                       class="px-4 py-2 rounded text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 transition">
+                        Réinitialiser l’application
+                    </a>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="bg-error/10 border border-error text-error p-4 rounded text-sm">
+            <strong class="block font-semibold">
+                Politique de confidentialité non acceptée
+            </strong>
+            <p>
+                Vous devez accepter la politique de confidentialité et les cookies
+                avant d’activer la double authentification.
+            </p>
+        </div>
+    }
+
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

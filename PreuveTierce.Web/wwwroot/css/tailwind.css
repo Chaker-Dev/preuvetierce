@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@layer utilities {
+    /* Couleurs institutionnelles */
+    .text-primary {
+        color: #000091;
+    }
+
+    .bg-primary {
+        background-color: #000091;
+    }
+
+        .bg-primary:hover {
+            background-color: #000074;
+        }
+
+    .bg-soft {
+        background-color: #f5f5fe;
+    }
+
+    .border-primary {
+        border-color: #000091;
+    }
+
+    /* Ombres & animations (Material-like) */
+    .card-shadow {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+}
+@layer base {
+    :root {
+        --font-sans: "Marianne", "Roboto", sans-serif;
+    }
+}

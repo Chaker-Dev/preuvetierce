@@ -1,0 +1,20 @@
+﻿@{
+     Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<div class="max-w-6xl mx-auto px-4 py-10">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+        <!-- MENU -->
+        <aside class="md:col-span-1 bg-white p-6 rounded-lg card-shadow">
+            <partial name="_ManageNav" />
+        </aside>
+
+        <!-- CONTENU -->
+        <main class="md:col-span-3 bg-white p-8 rounded-lg card-shadow">
+            @RenderBody()
+        </main>
+
+    </div>
+</div>
+@RenderSection("Scripts", required: false)

@@ -1,0 +1,69 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="min-h-[70vh] flex items-center justify-center">
+    <div class="w-full max-w-md bg-white rounded-lg card-shadow p-8">
+        <div class="text-center">
+            <h1 class="text-2xl font-semibold text-primary mb-2">Connexion</h1>
+            <p class="text-gray-600">Utilisez votre compte pour vous connecter</p>
+        </div>
+
+        <form id="account" method="post" class="mt-6 space-y-4">
+            <div asp-validation-summary="ModelOnly" class="text-error text-sm mb-4" role="alert"></div>
+
+            <!-- Email -->
+            <div>
+                <label asp-for="Input.Email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input asp-for="Input.Email" class="mt-1 block w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" placeholder="votre.email@exemple.com" />
+                <span asp-validation-for="Input.Email" class="text-error text-sm"></span>
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label asp-for="Input.Password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                <input asp-for="Input.Password" class="mt-1 block w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" placeholder="••••••••" />
+                <span asp-validation-for="Input.Password" class="text-error text-sm"></span>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="flex items-center">
+                <input asp-for="Input.RememberMe" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
+                <label asp-for="Input.RememberMe" class="ml-2 block text-sm text-gray-700">Se souvenir de moi</label>
+            </div>
+
+            <!-- Submit -->
+            <div>
+                <button type="submit" class="w-full bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition font-medium">Se connecter</button>
+            </div>
+
+            <!-- Liens -->
+            <div class="flex flex-col text-center space-y-2 text-sm">
+                <a asp-page="./ForgotPassword" class="text-primary hover:underline">Mot de passe oublié ?</a>
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary hover:underline">Créer un compte</a>
+                <a asp-page="./ResendEmailConfirmation" class="text-primary hover:underline">Renvoyer la confirmation email</a>
+            </div>
+        </form>
+
+        <!-- External Logins -->
+        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+        {
+            <div class="mt-6">
+                <h3 class="text-center text-gray-600 mb-2">Ou utilisez un autre service</h3>
+                <div class="flex flex-col space-y-2">
+                    @foreach (var provider in Model.ExternalLogins!)
+                    {
+                        <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                            <button type="submit" name="provider" value="@provider.Name" class="w-full border border-gray-300 rounded px-4 py-2 hover:bg-gray-100 transition text-sm font-medium">
+                                Se connecter avec @provider.DisplayName
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

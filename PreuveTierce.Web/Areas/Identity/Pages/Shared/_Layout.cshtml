@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Identity
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+@using PreuveTierce.Web.Data
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PreuveTierce</title>
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body class="bg-soft text-primary font-sans">
+    <header class="bg-white shadow-sm p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-primary">PreuveTierce</a>
+            <partial name="_LoginPartial" />
+        </div>
+    </header>
+    <main class="container mx-auto my-6">
+        @RenderBody()
+    </main>
+    <footer class="bg-gray-100 text-gray-700 text-sm py-4 mt-10 text-center">
+        &copy; 2025 PreuveTierce
+    </footer>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

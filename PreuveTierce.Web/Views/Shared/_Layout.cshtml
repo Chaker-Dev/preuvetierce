@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PreuveTierce </title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PreuveTierce.Web.styles.css" asp-append-version="true" />
+</head>
+<body class="grid grid-rows-[10vh_1fr_10vh] min-h-screen">
+    <header bg-white border-b border-gray-100 shadow-sm>
+        <nav class="h-full flex items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="flex justify-between items-center h-full">
+                    <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="showPage('home')">
+                        <a class="text-2xl font-bold text-primary tracking-tight" asp-area="" asp-controller="Home" asp-action="Index">PreuveTierce<span class="text-xs align-top opacity-70">.fr</span></a>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden md:flex items-center space-x-4">
+                            <!-- Vérification publique -->
+                            <a asp-controller="Home"
+                               asp-action="Index"
+                               class="text-sm font-medium text-textPrimary hover:text-primary transition">
+                                Vérification publique
+                            </a>
+
+                            <!-- Espace client -->
+                            <a asp-controller="Dashboard"
+                               asp-action="Index"
+                               class="text-sm font-medium text-textPrimary hover:text-primary transition">
+                                Espace client
+                            </a> 
+
+                            <span class="h-6 w-px bg-gray-300 mx-2"></span>
+
+                            <partial name="_LoginPartial" />
+
+                        </div>
+                        <!-- Mobile menu button -->
+                        <div class="md:hidden flex items-center">
+                            <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                                ☰
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+            <a asp-controller="Home" asp-action="Verify" class="block py-2 text-gray-700 hover:text-primary">Vérification publique</a>
+            <a asp-controller="Dashboard" asp-action="Index" class="block py-2 text-gray-700 hover:text-primary">Espace client</a>
+           <partial name="_LoginPartial" />
+        </div>
+    </header>
+    <main role="main" class="container mx-auto bg-soft ">
+        <div class="max-w-7xl mx-auto px-4">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="bg-white shadow-sm border-t border-gray-100 sticky flex items-center">
+        <div class="max-w-7xl mx-auto px-4 py-4 text-center text-gray-600 text-sm">
+            &copy; 2026 - PreuveTierce -
+            <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-primary hover:underline">Privacy</a>
+        </div>
+    </footer>
+    <script>
+        // Mobile menu toggle
+        const btn = document.getElementById('mobile-menu-button');
+        const menu = document.getElementById('mobile-menu');
+        btn?.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

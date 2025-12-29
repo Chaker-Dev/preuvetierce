@@ -1,0 +1,100 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Créer un compte";
+}
+
+<div class="min-h-[70vh] flex items-center justify-center">
+    <div class="w-full max-w-md bg-white rounded-lg card-shadow p-8">
+
+        <!-- Titre -->
+        <h1 class="text-2xl font-semibold text-textPrimary mb-2">
+            Créer un compte
+        </h1>
+        <p class="text-sm text-gray-500 mb-6">
+            Accédez à votre espace sécurisé PreuveTierce
+        </p>
+
+        <!-- Erreurs globales -->
+        <div asp-validation-summary="ModelOnly"
+             class="mb-4 text-sm text-error"
+             role="alert">
+        </div>
+
+        <!-- Formulaire -->
+        <form id="registerForm"
+              asp-route-returnUrl="@Model.ReturnUrl"
+              method="post"
+              class="space-y-4">
+
+            <!-- Email -->
+            <div>
+                <label asp-for="Input.Email"
+                       class="block text-sm font-medium text-textPrimary mb-1">
+                    Adresse email
+                </label>
+                <input asp-for="Input.Email"
+                       type="email"
+                       autocomplete="username"
+                       aria-required="true"
+                       placeholder="nom@exemple.fr"
+                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
+                <span asp-validation-for="Input.Email"
+                      class="text-xs text-error"></span>
+            </div>
+
+            <!-- Mot de passe -->
+            <div>
+                <label asp-for="Input.Password"
+                       class="block text-sm font-medium text-textPrimary mb-1">
+                    Mot de passe
+                </label>
+                <input asp-for="Input.Password"
+                       type="password"
+                       autocomplete="new-password"
+                       aria-required="true"
+                       placeholder="••••••••"
+                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
+                <span asp-validation-for="Input.Password"
+                      class="text-xs text-error"></span>
+            </div>
+
+            <!-- Confirmation -->
+            <div>
+                <label asp-for="Input.ConfirmPassword"
+                       class="block text-sm font-medium text-textPrimary mb-1">
+                    Confirmer le mot de passe
+                </label>
+                <input asp-for="Input.ConfirmPassword"
+                       type="password"
+                       autocomplete="new-password"
+                       aria-required="true"
+                       placeholder="••••••••"
+                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
+                <span asp-validation-for="Input.ConfirmPassword"
+                      class="text-xs text-error"></span>
+            </div>
+
+            <!-- Bouton -->
+            <button id="registerSubmit"
+                    type="submit"
+                    class="w-full bg-primary text-white py-2.5 rounded-md font-medium shadow-sm hover:bg-opacity-90 transition">
+                Créer mon compte
+            </button>
+        </form>
+
+        <!-- Lien connexion -->
+        <div class="mt-6 text-center text-sm">
+            <span class="text-gray-500">Déjà un compte ?</span>
+            <a asp-page="./Login"
+               asp-route-returnUrl="@Model.ReturnUrl"
+               class="text-primary font-medium hover:underline ml-1">
+                Se connecter
+            </a>
+        </div>
+    </div>
+</div>
+
+@* @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} *@

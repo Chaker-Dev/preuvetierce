@@ -3,7 +3,9 @@ module.exports = {
     content: [
         "./Views/**/*.cshtml",
         "./Areas/**/*.cshtml",
-        "./Pages/**/*.cshtml"
+        "./Pages/**/*.cshtml",
+        "./wwwroot/**/*.html",
+        "./wwwroot/**/*.js"
     ],
     theme: {
         fontFamily: {

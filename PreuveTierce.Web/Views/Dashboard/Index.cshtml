@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Espace client";
+}
+
+<div class="max-w-6xl mx-auto py-10 space-y-10">
+
+    <!-- Titre -->
+    <div>
+        <h1 class="text-2xl font-semibold text-primary">
+            Espace client
+        </h1>
+        <p class="text-sm text-gray-600 mt-1">
+            Déposez vos documents, générez des preuves d’authenticité et consultez votre historique.
+        </p>
+    </div>
+
+    <!-- Upload -->
+    <partial name="_UploadCard" />
+
+    <!-- Historique -->
+    <partial name="_HistoryTable" />
+
+</div>

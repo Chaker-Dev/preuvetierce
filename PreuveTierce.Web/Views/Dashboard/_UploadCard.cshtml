@@ -1,0 +1,33 @@
+﻿<div class="bg-white rounded-lg card-shadow p-6 space-y-6">
+
+    <h2 class="text-lg font-medium text-primary">
+        📤 Déposer un document
+    </h2>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+
+        <!-- Dropzone -->
+        <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer bg-soft hover:bg-soft/70 transition">
+            <div class="flex flex-col items-center justify-center space-y-2 text-center">
+                <span class="text-primary text-2xl">⬆️</span>
+                <p class="text-sm font-medium text-textPrimary">
+                    Cliquez ou glissez un document ici
+                </p>
+                <p class="text-xs text-gray-500">
+                    PDF, DOCX, JPG – max 10 Mo
+                </p>
+            </div>
+            <input type="file" class="hidden" />
+        </label>
+
+        <!-- Submit -->
+        <div class="flex justify-end">
+            <button type="submit"
+                    class="bg-primary text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition">
+                Générer la preuve
+            </button>
+        </div>
+
+    </form>
+
+</div>

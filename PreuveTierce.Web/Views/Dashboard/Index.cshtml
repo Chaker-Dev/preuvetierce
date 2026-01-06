@@ -21,3 +21,50 @@
     <partial name="_HistoryTable" />
 
 </div>
+@section Scripts {
+    <script>
+        const rowsPerPage = 5;
+        let currentPage = 1;
+
+        const rows = Array.from(document.querySelectorAll("#tableBody tr"));
+        const searchInput = document.getElementById("searchInput");
+        const pageInfo = document.getElementById("pageInfo");
+
+        function renderTable() {
+            if (!rows.length) return;
+
+            const filter = searchInput.value.toLowerCase();
+            const filteredRows = rows.filter(r =>
+                r.innerText.toLowerCase().includes(filter)
+            );
+
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+            currentPage = Math.min(currentPage, totalPages || 1);
+
+            rows.forEach(r => r.style.display = "none");
+
+            filteredRows
+                .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+                .forEach(r => r.style.display = "");
+
+            pageInfo.textContent = `Page ${currentPage} / ${totalPages || 1}`;
+        }
+
+        searchInput?.addEventListener("input", () => {
+            currentPage = 1;
+            renderTable();
+        });
+
+        document.getElementById("prevPage")?.addEventListener("click", () => {
+            if (currentPage > 1) currentPage--;
+            renderTable();
+        });
+
+        document.getElementById("nextPage")?.addEventListener("click", () => {
+            currentPage++;
+            renderTable();
+        });
+
+        document.addEventListener("DOMContentLoaded", renderTable);
+    </script>
+}

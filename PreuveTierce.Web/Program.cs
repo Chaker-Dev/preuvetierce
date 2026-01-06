@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PreuveTierce.Web.Data;
-using Microsoft.AspNetCore.Identity;
+using Google.Cloud.Firestore;
 
 namespace PreuveTierce.Web
 {
@@ -9,7 +9,14 @@ namespace PreuveTierce.Web
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
+            // Firebase Conf
+            string path = Path.Combine(builder.Environment.ContentRootPath, "firebase-auth.json");
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", path);
+            
+            builder.Services.AddSingleton<FirestoreDb>(s => {
+                return FirestoreDb.Create("preuvetierce"); 
+            });
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             

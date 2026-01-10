@@ -1,6 +1,8 @@
+using Google.Cloud.Firestore;
 using Microsoft.EntityFrameworkCore;
 using PreuveTierce.Web.Data;
-using Google.Cloud.Firestore;
+using PreuveTierce.Web.Services;
+using PreuveTierce.Web.Services.Interfaces;
 
 namespace PreuveTierce.Web
 {
@@ -9,6 +11,9 @@ namespace PreuveTierce.Web
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            //QuestPDF config
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
             
             // Firebase Conf
             string path = Path.Combine(builder.Environment.ContentRootPath, "firebase-auth.json");
@@ -38,6 +43,11 @@ namespace PreuveTierce.Web
 
             builder.Services.AddControllersWithViews();
 
+            // Others services
+            builder.Services.AddScoped<ICertificationService, CertificationService>();
+            builder.Services.AddTransient<IQrCodeService, QrCodeService>();
+            builder.Services.AddTransient<IPdfGeneratorService, PdfGeneratorService>();
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

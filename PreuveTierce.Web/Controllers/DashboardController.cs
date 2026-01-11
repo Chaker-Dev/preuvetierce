@@ -52,12 +52,5 @@ namespace PreuveTierce.Web.Controllers
                 fileName
             );
         }
-
-        private async Task<byte[]> GenerateCertificationPdfAsync(string serial)
-        {
-            // 🔴 Placeholder temporaire
-            // On implémentera la vraie génération après
-            return await System.IO.File.ReadAllBytesAsync("wwwroot/sample.pdf");
-        }
     }
 }

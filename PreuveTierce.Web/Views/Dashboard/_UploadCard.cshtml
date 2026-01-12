@@ -3,27 +3,64 @@
     <h2 class="text-lg font-medium text-primary">
         📤 Déposer un document
     </h2>
+    <form method="post" enctype="multipart/form-data" asp-controller="Dashboard" asp-action="Upload" class="space-y-4">
 
-    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        <div class="space-y-1">
+            <label for="reference"
+                   class="block text-sm font-medium text-gray-700">
+                Référence dossier
+                <span class="text-gray-400 text-xs">(optionnel)</span>
+            </label>
 
-        <!-- Dropzone -->
-        <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer bg-soft hover:bg-soft/70 transition">
-            <div class="flex flex-col items-center justify-center space-y-2 text-center">
-                <span class="text-primary text-2xl">⬆️</span>
-                <p class="text-sm font-medium text-textPrimary">
+            <div class="relative">
+                <input type="text"
+                       name="reference"
+                       id="reference"
+                       placeholder="Ex : CONTRAT-CLIENT-ALPHA"
+                       class="block w-full rounded-md border border-gray-300 bg-white
+                      px-3 py-2 text-sm text-gray-900
+                      placeholder-gray-400
+                      focus:outline-none focus:ring-2 focus:ring-primary/40
+                      focus:border-primary
+                      hover:border-primary/60
+                      transition" />
+
+                <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 text-xs">
+                    REF
+                </span>
+            </div>
+
+            <p class="text-xs text-gray-500 py-1 px-2">
+                Cette référence vous aide à retrouver facilement votre document (facture, contrat, projet…)
+            </p>
+        </div>
+
+        <label id="dropzone-label" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer bg-soft hover:bg-soft/70 transition">
+
+            <div class="flex flex-col items-center justify-center space-y-2 text-center px-4">
+                <span id="upload-icon" class="text-primary text-2xl">⬆️</span>
+
+                <p id="file-name-display" class="text-sm font-medium text-textPrimary break-all">
                     Cliquez ou glissez un document ici
                 </p>
-                <p class="text-xs text-gray-500">
+
+                <p id="file-instructions" class="text-xs text-gray-500">
                     PDF, DOCX, JPG – max 10 Mo
                 </p>
             </div>
-            <input type="file" class="hidden" />
+
+            <input type="file"
+                   name="file"
+                   id="file-upload"
+                   class="hidden"
+                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                   required
+                   onchange="updateFileName(this)" />
         </label>
 
-        <!-- Submit -->
         <div class="flex justify-end">
             <button type="submit"
-                    class="bg-primary text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition">
+                    class="cursor-pointer bg-primary text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition shadow-sm">
                 Générer la preuve
             </button>
         </div>
@@ -31,3 +68,39 @@
     </form>
 
 </div>
+<script>
+    function updateFileName(input) {
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const fileInstructions = document.getElementById('file-instructions');
+        const uploadIcon = document.getElementById('upload-icon');
+        const dropzoneLabel = document.getElementById('dropzone-label');
+
+        if (input.files && input.files.length > 0) {
+            // 1. On récupère le nom du fichier
+            const name = input.files[0].name;
+
+            // 2. On met à jour le texte
+            fileNameDisplay.textContent = name;
+            fileNameDisplay.classList.add("text-primary", "font-bold"); // On met le nom en évidence (bleu + gras)
+
+            // 3. On change l'icône pour montrer que c'est un fichier
+            uploadIcon.textContent = "📄";
+
+            // 4. On cache les instructions inutiles
+            fileInstructions.classList.add('hidden');
+
+            // 5. Petit feedback visuel sur la bordure (devient pleine et bleue)
+            dropzoneLabel.classList.remove('border-dashed', 'border-primary/30');
+            dropzoneLabel.classList.add('border-solid', 'border-primary', 'bg-blue-50');
+        } else {
+            // Si l'utilisateur annule, on remet tout comme avant
+            fileNameDisplay.textContent = "Cliquez ou glissez un document ici";
+            fileNameDisplay.classList.remove("text-primary", "font-bold");
+            uploadIcon.textContent = "⬆️";
+            fileInstructions.classList.remove('hidden');
+
+            dropzoneLabel.classList.add('border-dashed', 'border-primary/30');
+            dropzoneLabel.classList.remove('border-solid', 'border-primary', 'bg-blue-50');
+        }
+    }
+</script>

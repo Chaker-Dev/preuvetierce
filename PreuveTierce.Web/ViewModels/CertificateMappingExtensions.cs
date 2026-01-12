@@ -14,9 +14,9 @@
                 FileName = doc.FileName,
                 FileSizeBytes = doc.FileSize,
                 FileSizeFormatted = FormatFileSize(doc.FileSize),
-                ClientReference = doc.OwnerId,
+                ClientReference = doc.Reference,
                 FileHash = doc.Hash,
-                VerificationUrl = $"{verificationBaseUrl}/verify/{doc.SerialNumber}"
+                VerificationUrl = $"{verificationBaseUrl}/verify/{doc.Hash}"
             };
         }
 

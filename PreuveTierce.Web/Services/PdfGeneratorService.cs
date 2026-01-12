@@ -17,8 +17,6 @@ namespace PreuveTierce.Web.Services
         private static readonly Color GrisTexte = Colors.Grey.Darken2;
         private static readonly Color GrisClairLabel = Colors.Grey.Medium;
         private static readonly Color GrisFondTableau = Colors.Grey.Lighten4;
-
-        // Injection du service QR Code (Constructor Injection)
         public PdfGeneratorService(IQrCodeService qrCodeService)
         {
             _qrCodeService = qrCodeService;
@@ -30,7 +28,7 @@ namespace PreuveTierce.Web.Services
                 data, 
                 "ATTESTATION DE DÉPÔT", 
                 "Preuve d'enregistrement numérique", 
-                BleuPreuve,
+                Colors.Black,
                 isOfficialCertificate: false
                 );
         }
@@ -59,10 +57,12 @@ namespace PreuveTierce.Web.Services
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily(Fonts.Arial).FontColor(GrisTexte));
                     page.PageColor(Colors.White);
 
-                    // ===== HEADER =====
+                    // header
                     page.Header().Element(head => ComposeHeader(head, data, themeColor, isOfficialCertificate));
-                    // Content (Logique conditionnelle à l'intérieur)
+
+                    // Content 
                     page.Content().Element(body => ComposeContent(body, data, title, subtitle, themeColor, isOfficialCertificate));
+
                     // Footer
                     page.Footer().Element(foot => ComposeFooter(foot, qrImage, data.FileHash, themeColor));
 
@@ -84,11 +84,7 @@ namespace PreuveTierce.Web.Services
                         t.Span("PREUVE").FontSize(28).Bold().FontColor(BleuPreuve);
                         t.Span("TIERCE").FontSize(28).Bold().FontColor(themeColor);
                     });
-
-                    if (isOfficial)
-                    {
-                        c.Item().Text("Tiers de Confiance Numérique").FontSize(12).FontColor(GrisClairLabel).LetterSpacing(0.1f);
-                    }
+                    c.Item().Text("Tiers de Confiance Numérique").FontSize(12).FontColor(GrisClairLabel).LetterSpacing(0.1f);
                 });
 
                 row.RelativeItem().AlignRight().Column(c =>

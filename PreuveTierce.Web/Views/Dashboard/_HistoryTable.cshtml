@@ -27,8 +27,6 @@
             </thead>
 
             <tbody id="tableBody" class="bg-white divide-y divide-gray-100">
-                @for (int i = 0; i < 11; i++)
-                {
                     @foreach (var item in Model)
                     {
                         <tr class="hover:bg-[#f5f5fe] transition duration-150 ease-in-out group">
@@ -55,9 +53,9 @@
                                      title="@fullHash"
                                      >
                                     <span class="px-2 py-1 rounded bg-gray-100 text-gray-600 text-[11px] font-mono
-                             group-hover/hash:border-[#000091]
-                             group-hover/hash:text-[#000091]
-                             transition">
+                                         group-hover/hash:border-[#000091]
+                                         group-hover/hash:text-[#000091]
+                                         transition">
                                         @shortHash
                                     </span>
 
@@ -75,9 +73,18 @@
                                 <span class="text-xs text-gray-400">@item.CertifiedAt.ToString("HH:mm") UTC</span>
                             </td>
                             <td class="py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
-                                    @item.Status
-                                </span>
+                                @{
+                                    string statusLabel = item.Status?.ToLower() switch
+                                    {
+                                        "certificated" => "CERTIFIÉ",
+                                        "certified" => "CERTIFIÉ",
+                                        _ => item.Status?.ToUpper() ?? "-"
+                                    };
+                                }
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                      bg-green-100 text-green-800 border border-green-200">
+                                @statusLabel
+                            </span>
                             </td>
                             <td class="py-4 whitespace-nowrap">
                                 <a asp-controller="Dashboard"
@@ -97,17 +104,20 @@
                                 </a>
                             </td>
                     </tr>
-                }}
+                }
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
-    <div class="bg-gray-50 px-6 py-3 flex items-center justify-between">
-        <span id="pageInfo" class="text-sm text-gray-600"></span>
+    @if (Model != null && Model.Count > 5)
+    {
+        <div  class="bg-gray-50 px-6 py-3 flex items-center justify-between">
+            <span id="pageInfo" class="text-sm text-gray-600"></span>
         <div class="flex gap-3 space-x-2">
-            <button id="prevPage" class="px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50">Précédent</button>
-            <button id="nextPage" class="px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-primary bg-white hover:bg-gray-50">Suivant</button>
+                <button id="prevPage" class="cursor-pointer px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50">Précédent</button>
+                <button id="nextPage" class="cursor-pointer px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-primary bg-white hover:bg-gray-50">Suivant</button>
         </div>
     </div>
+    }
 </div>

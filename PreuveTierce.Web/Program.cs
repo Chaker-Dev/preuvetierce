@@ -47,7 +47,8 @@ namespace PreuveTierce.Web
             builder.Services.AddScoped<ICertificationService, CertificationService>();
             builder.Services.AddTransient<IQrCodeService, QrCodeService>();
             builder.Services.AddTransient<IPdfGeneratorService, PdfGeneratorService>();
-            
+            builder.Services.AddScoped<IFileHasherService, FileHasherService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

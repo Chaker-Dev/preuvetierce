@@ -1,4 +1,6 @@
-﻿@{
+﻿@using PreuveTierce.Web.ViewModels
+@model VerifyPresenceViewModel?
+@{
     ViewData["Title"] = "Vérification publique";
 }
 
@@ -7,6 +9,17 @@
             <h1 class="text-4xl font-extrabold text-primary mb-2">Sécurisez vos documents</h1>
             <p class="text-lg text-gray-600">Le tiers de confiance technique pour l'intégrité numérique.</p>
         </div>
+
+            @if (Model != null)
+            {
+                <partial name="_VerifyPresenceCard" model="Model" />
+            }
+            else if (ViewBag.VerifyError != null)
+            {
+                <div class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+                    @ViewBag.VerifyError
+                </div>
+            }
 
         <div class="bg-white rounded-xl card-shadow overflow-hidden">
             <div class="bg-soft p-4 border-b border-gray-100 flex justify-between items-center">
@@ -17,21 +30,55 @@
                 <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border">Aucun fichier stocké</span>
             </div>
 
-            <div class="p-10">
-                <div class="border-2 border-dashed border-primary border-opacity-30 rounded-lg p-12 text-center hover:bg-soft transition cursor-pointer group">
-                    <div class="mb-4">
-                        <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-primary transition" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </div>
-                    <p class="text-sm text-gray-600">
-                        <span class="font-medium text-primary">Cliquez pour uploader</span> ou glissez-déposez
-                    </p>
-                    <p class="text-xs text-gray-500 mt-1">PDF, DOCX, PNG, JPG (SHA-256 Hash local)</p>
+         <div class="p-10">
+            <div id="dropzone"
+                 class="border-2 border-dashed border-primary/30 rounded-lg p-12 text-center hover:bg-soft transition-all cursor-pointer group relative">
+
+                <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+
+                <div class="mb-4">
+                    <svg id="uploadIcon" class="mx-auto h-12 w-12 text-gray-400 group-hover:text-primary transition" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
                 </div>
+
+                <p id="dropzoneText" class="text-sm text-gray-600">
+                    <span class="font-medium text-primary">Cliquez pour uploader</span> ou glissez-déposez
+                </p>
+                <p id="dropzoneHint" class="text-xs text-gray-500 mt-1 italic">Calcul de l'empreinte numérique local sécurisé</p>
+            </div>
+            <div class="flex flex-col items-center mt-2 space-y-4">
+                <button id="verifyBtn"
+                        disabled
+                        class="group relative px-10 py-4 rounded-xl font-bold text-white shadow-2xl transition-all duration-300 transform
+                   /* État normal (sera actif quand disabled sera retiré) */
+                   bg-blue-600 hover:bg-blue-700 hover:shadow-blue-500/40 hover:-translate-y-1
+                   active:scale-95 active:translate-y-0
+                   /* État désactivé */
+                   disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed">
+
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+
+                    <div class="relative flex items-center justify-center">
+                        <svg id="btnSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+
+                        <span id="btnText" class="tracking-wide">Lancer la vérification</span>
+                    </div>
+                </button>
+
+                <p id="btnHint" class="flex items-center text-xs text-gray-400 italic transition-colors duration-300">
+                    <span id="hintIcon" class="mr-1.5">ℹ️</span>
+                    <span id="hintText">Veuillez d'abord sélectionner un fichier</span>
+                </p>
+            </div>
+
+            <div id="resultArea" class="hidden transition-all duration-500">
             </div>
         </div>
-
+        </div>
     <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-5 space-y-3">
 
         <div class="flex items-start">
@@ -82,3 +129,7 @@
     </div>
 
     </section>
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

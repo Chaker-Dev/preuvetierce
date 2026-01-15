@@ -1,0 +1,109 @@
+﻿function closeVerifyPresence() {
+    const card = document.getElementById('verify-presence-card');
+    if (!card) return;
+
+    card.classList.add('opacity-0', 'scale-95');
+
+    setTimeout(() => {
+        card.remove();
+
+        // Optionnel : scroll vers la zone d’upload
+        const uploadZone = document.getElementById('view-home');
+        uploadZone?.scrollIntoView({ behavior: 'smooth' });
+
+    }, 200);
+}
+
+async function verifyPresence() {
+    const serial = document.getElementById('certificateSerialInput').value;
+
+    const response = await fetch('/Home/VerifyPresence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `certificateSerial=${encodeURIComponent(serial)}`
+    });
+    alert('BRAVO !');
+    const html = await response.text();
+    document.getElementById('verify-presence-result').innerHTML = html;
+}
+// --- GESTION DU DRAG & DROP ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnHint = document.getElementById('btnHint');
+    const resultArea = document.getElementById('resultArea');
+    // --- 1. GESTION DES CLICS ---
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+
+    // --- 2. GESTION DU DRAG & DROP (MODERNE) ---
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+    });
+
+    dropzone.addEventListener('dragenter', () => {
+        dropzone.classList.add('bg-blue-50', 'border-primary', 'scale-[1.02]');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('bg-blue-50', 'border-primary', 'scale-[1.02]');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        dropzone.classList.remove('scale-[1.02]');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) handleFile(files[0]);
+    });
+
+    // --- 3. TRAITEMENT DU FICHIER ET HACHAGE ---
+    async function handleFile(file) {
+        updateUISelected(file.name);
+        verifyBtn.disabled = true;
+        btnText.textContent = "Calcul de l'empreinte...";
+        resultArea.classList.add('hidden');
+        try {
+            console.log("Calcul du Hash pour :", file.name);
+            const hash = await computeSHA256(file);
+            console.log("Hash calculé :", hash);
+            verifyBtn.disabled = false;
+            btnText.textContent = "Vérifier l'authenticité";
+            btnHint.textContent = "Empreinte générée : " + hash.substring(0, 15) + "...";
+            btnHint.classList.add('text-primary');
+            // Ici, tu pourras appeler ton API de vérification avec ce hash
+            // verifyDocumentOnServer(hash);
+        } catch (err) {
+            console.error("Erreur de hachage:", err);
+        }
+    }
+
+    // --- FONCTION DE HACHAGE SHA-256 (CLIENT-SIDE) ---
+    async function computeSHA256(file) {
+        const buffer = await file.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function updateUISelected(fileName) {
+        const text = document.getElementById('dropzoneText');
+        const icon = document.getElementById('uploadIcon');
+        const hint = document.getElementById('dropzoneHint');
+
+        text.innerHTML = `Fichier prêt : <span class="text-primary font-bold">${fileName}</span>`;
+        hint.classList.add('hidden');
+        icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+        icon.classList.replace('text-gray-400', 'text-green-500');
+        dropzone.classList.add('border-solid', 'bg-green-50/20');
+        dropzone.classList.remove('border-dashed');
+    }
+});

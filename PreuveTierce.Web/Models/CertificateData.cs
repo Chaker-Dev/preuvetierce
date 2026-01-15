@@ -1,4 +1,4 @@
-﻿namespace PreuveTierce.Web.ViewModels
+﻿namespace PreuveTierce.Web.Models
 {
     public class CertificateData
     {

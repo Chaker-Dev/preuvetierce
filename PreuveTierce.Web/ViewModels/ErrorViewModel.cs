@@ -1,4 +1,4 @@
-namespace PreuveTierce.Web.Models
+namespace PreuveTierce.Web.ViewModels
 {
     public class ErrorViewModel
     {

@@ -39,3 +39,42 @@
         --font-sans: "Marianne", "Roboto", sans-serif;
     }
 }
+
+@media print {
+    @page {
+        size: auto;
+        margin: 0;
+    }
+
+    body {
+        display: block !important;
+        min-height: auto !important;
+        margin: 0;
+        padding: 0;
+        overflow: visible !important;
+    }
+
+        body * {
+            visibility: hidden;
+        }
+    .print-hidden {
+        display: none !important;
+    }
+
+    #verify-presence-card,
+    #verify-presence-card * {
+        visibility: visible;
+    }
+
+    #verify-presence-card {
+        position: relative;
+        width: 100%;
+        page-break-after: avoid;
+        page-break-before: avoid;
+        page-break-inside: avoid;
+        overflow: visible;
+    }
+    header, footer {
+        display: none !important;
+    }
+}

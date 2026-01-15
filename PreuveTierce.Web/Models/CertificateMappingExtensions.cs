@@ -1,4 +1,4 @@
-﻿namespace PreuveTierce.Web.ViewModels
+﻿namespace PreuveTierce.Web.Models
 {
     public static class CertificateMappingExtensions
     {
@@ -16,7 +16,7 @@
                 FileSizeFormatted = FormatFileSize(doc.FileSize),
                 ClientReference = doc.Reference,
                 FileHash = doc.Hash,
-                VerificationUrl = $"{verificationBaseUrl}/verify/{doc.Hash}"
+                VerificationUrl = $"{verificationBaseUrl}/VerifyPresence/{doc.SerialNumber}"
             };
         }
 

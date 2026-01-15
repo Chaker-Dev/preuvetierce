@@ -1,4 +1,4 @@
-﻿using PreuveTierce.Web.ViewModels;
+﻿using PreuveTierce.Web.Models;
 
 namespace PreuveTierce.Web.Services.Interfaces
 {

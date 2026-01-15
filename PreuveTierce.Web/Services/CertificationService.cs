@@ -1,6 +1,6 @@
 ﻿using Google.Cloud.Firestore;
+using PreuveTierce.Web.Models;
 using PreuveTierce.Web.Services.Interfaces;
-using PreuveTierce.Web.ViewModels;
 
 namespace PreuveTierce.Web.Services
 {
@@ -65,6 +65,17 @@ namespace PreuveTierce.Web.Services
             DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
             return snapshot.Exists;
         }
+        public async Task<CertifiedDocument?> GetBySerialAsync(string certificateSerial)
+        {
+            var query = _db.Collection("Certifications")
+                   .WhereEqualTo("certificate_serial", certificateSerial)
+                   .Limit(1);
+
+            var snapshot = await query.GetSnapshotAsync();
+            if (!snapshot.Documents.Any()) return null;
+
+            return MapToModel(snapshot.Documents.First());
+        }
 
         private CertifiedDocument MapToModel(DocumentSnapshot doc)
         {
@@ -80,6 +91,6 @@ namespace PreuveTierce.Web.Services
                 CertifiedAt = doc.GetValue<Timestamp>("createdAt").ToDateTime()
             };
         }
-
+       
     }
 }

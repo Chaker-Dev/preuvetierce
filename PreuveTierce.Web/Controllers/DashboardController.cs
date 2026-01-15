@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PreuveTierce.Web.Models;
 using PreuveTierce.Web.Services.Interfaces;
 using PreuveTierce.Web.ViewModels;
 using System.Security.Claims;

@@ -1,5 +1,5 @@
-﻿using PreuveTierce.Web.Services.Interfaces;
-using PreuveTierce.Web.ViewModels;
+﻿using PreuveTierce.Web.Models;
+using PreuveTierce.Web.Services.Interfaces;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;

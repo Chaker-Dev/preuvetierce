@@ -1,0 +1,104 @@
+﻿@using PreuveTierce.Web.ViewModels
+@model VerifyPresenceViewModel?
+
+<div id="verify-presence-card" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4"> 
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-300">
+        <div>
+            <h2 class="text-lg font-bold text-primary">
+                Certificat de présence numérique
+            </h2>
+            <p class="text-xs text-gray-500">
+                Preuve d’enregistrement & d’horodatage
+            </p>
+        </div>
+        <div class="flex justify-between items-center gap-3">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                     bg-green-100 text-green-800 border border-green-200">
+            CERTIFIÉ
+        </span>
+            <button onclick="closeVerifyPresence()"
+                    class="cursor-pointer text-gray-400 print-hidden hover:text-gray-700 transition"
+                    aria-label="Fermer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            </div>
+    </div>
+
+    <!-- Content -->
+    <div class="px-6 py-6 space-y-4 text-sm">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-500 text-xs">Numéro de certificat</p>
+                <p class="font-mono font-semibold text-gray-900">
+                    @Model.CertificateSerial
+                </p>
+            </div>
+
+            <div>
+                <p class="text-gray-500 text-xs">Date d’enregistrement (UTC)</p>
+                <p class="font-medium text-gray-900">
+                    @Model.CreatedAtUtc.ToString("dd MMMM yyyy – HH:mm:ss") UTC
+                </p>
+            </div>
+
+            <div>
+                <p class="text-gray-500 text-xs">Nom du fichier</p>
+                <p class="font-medium text-gray-900 truncate">
+                    @Model.FileName
+                </p>
+            </div>
+
+            <div>
+                <p class="text-gray-500 text-xs">Taille</p>
+                <p class="font-medium text-gray-900">
+                    @Model.FileSizeFormatted (@Model.FileSizeBytes.ToString("N0") octets)
+                </p>
+            </div>
+        </div>
+
+        <!-- Hash -->
+        <div>
+            <p class="text-gray-500 text-xs mb-1">
+                Empreinte cryptographique (SHA-256)
+            </p>
+
+            <div class="bg-gray-100 rounded-md px-3 py-2 font-mono text-xs break-all
+                        border-l-4 border-[#000091]"
+                 title="@Model.Hash">
+                @Model.Hash
+            </div>
+
+            <p class="text-[11px] text-gray-400 mt-1">
+                Toute modification du document entraînera une empreinte différente.
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex flex-wrap gap-3 justify-between items-center px-6 py-4 border-t border-gray-300 bg-gray-50">
+
+        <div class="text-xs text-gray-500 max-w-md">
+            Cette preuve atteste uniquement de la présence du document à une date donnée.
+            L’intégrité du fichier n’est pas vérifiée sans comparaison.
+        </div>
+
+        <div class="flex gap-3 print-hidden">
+            <button onclick="window.print()"
+                    class="cursor-pointer px-4 py-2 text-sm font-medium rounded-md
+                           bg-[#000091] text-white hover:bg-[#000074] transition">
+                Imprimer la preuve
+            </button>
+
+            <a href="#verify-integrity"
+               class="cursor-pointer px-4 py-2 text-sm font-medium rounded-md
+                      border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+                Vérifier l’authenticité
+            </a>
+        </div>
+    </div>
+</div>

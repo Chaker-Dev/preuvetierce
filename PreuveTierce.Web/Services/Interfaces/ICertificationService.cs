@@ -1,4 +1,4 @@
-﻿using PreuveTierce.Web.ViewModels;
+﻿using PreuveTierce.Web.Models;
 
 namespace PreuveTierce.Web.Services.Interfaces
 {
@@ -6,6 +6,7 @@ namespace PreuveTierce.Web.Services.Interfaces
     {
         Task<List<CertifiedDocument>> GetUserHistoryAsync(string userId);
         Task<CertifiedDocument> GetByHashAsync(string hash);
+        Task<CertifiedDocument?> GetBySerialAsync(string certificateSerial);
         Task<bool> RegisterCertificationAsync(CertifiedDocument document);
         Task<bool> ExistsAsync(string hash);
     }

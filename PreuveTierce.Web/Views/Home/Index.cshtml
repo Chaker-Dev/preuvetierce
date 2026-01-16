@@ -50,12 +50,23 @@
             <div class="flex flex-col items-center mt-2 space-y-4">
                 <button id="verifyBtn"
                         disabled
-                        class="group relative px-10 py-4 rounded-xl font-bold text-white shadow-2xl transition-all duration-300 transform
-                   /* État normal (sera actif quand disabled sera retiré) */
-                   bg-blue-600 hover:bg-blue-700 hover:shadow-blue-500/40 hover:-translate-y-1
-                   active:scale-95 active:translate-y-0
-                   /* État désactivé */
-                   disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed">
+                        class="cursor-pointer group relative w-full sm:w-auto min-w-[260px]
+                   px-8 py-4 rounded-2xl font-semibold text-white
+                   transition-all duration-300 ease-out
+                   flex items-center justify-center gap-3
+
+                   /* Active */
+                   bg-gradient-to-r from-[#000091] to-[#1e40af]
+                   hover:from-[#000074] hover:to-[#1e3a8a]
+                   hover:shadow-lg hover:shadow-blue-900/30
+                   hover:-translate-y-0.5
+                   active:translate-y-0 active:shadow-sm
+
+                   /* Disabled */
+                   disabled:from-gray-200 disabled:to-gray-300
+                   disabled:text-gray-400
+                   disabled:shadow-none
+                   disabled:cursor-not-allowed">
 
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
 
@@ -79,49 +90,8 @@
             </div>
         </div>
         </div>
-    <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-5 space-y-3">
+    <div id="resultArea" class="hidden transition-all duration-500"></div>
 
-        <div class="flex items-start">
-            <svg class="h-6 w-6 text-green-600 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-
-            <div class="flex-1">
-                <h3 class="text-sm font-semibold text-green-800">
-                    Document certifié authentique
-                </h3>
-
-                <p class="text-sm text-green-700 mt-1">
-                    Cette version du document correspond exactement à la preuve enregistrée.
-                </p>
-            </div>
-        </div>
-
-        <div class="m-3 text-xs text-gray-600 space-y-1 border-t border-green-200 pt-3">
-            <p class="flex gap-3"><strong>Horodatage (UTC) :</strong> 25 décembre 2025 – 14:30:05</p>
-            <p class="flex gap-3"><strong>Algorithme :</strong> SHA-256</p>
-            <p class="flex gap-3"><strong>Référence de preuve :</strong> <span class="font-mono">PT-2025-12-000123</span></p>
-            <p class="flex gap-3 break-all">
-                <strong>Empreinte :</strong>
-                e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-            </p>
-        </div>
-    </div>
-    <div class="mt-4 flex flex-wrap gap-3 justify-center items-center">
-
-        <button class="bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary/90 transition flex items-center">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 4v16m0 0l-4-4m4 4l4-4M4 20h16" />
-            </svg>
-            Télécharger l’attestation PDF
-        </button>
-
-        <button class="text-sm text-gray-600 hover:text-primary underline">
-            Vérifier un autre document
-        </button>
-
-    </div>
     <div class="mt-10 text-center text-xs text-gray-500 max-w-2xl mx-auto">
         PreuveTierce agit comme tiers de confiance technique.
         Aucun document n’est conservé.

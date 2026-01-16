@@ -64,7 +64,7 @@ namespace PreuveTierce.Web.Services
                     page.Content().Element(body => ComposeContent(body, data, title, subtitle, themeColor, isOfficialCertificate));
 
                     // Footer
-                    page.Footer().Element(foot => ComposeFooter(foot, qrImage, data.FileHash, themeColor));
+                    page.Footer().Element(foot => ComposeFooter(foot, qrImage, data.SerialNumber, themeColor));
 
                     // Filigrane (Watermark)
                     page.Foreground().Element(fg => ComposeWatermark(fg, watermarkText, themeColor));
@@ -173,7 +173,7 @@ namespace PreuveTierce.Web.Services
             });
         }
 
-        private void ComposeFooter(IContainer container, byte[] qrImage, string hash, Color themeColor)
+        private void ComposeFooter(IContainer container, byte[] qrImage, string serialNumber, Color themeColor)
         {
             container.PaddingTop(20).BorderTop(1).BorderColor(Colors.Grey.Lighten3).Row(row =>
             {
@@ -182,7 +182,7 @@ namespace PreuveTierce.Web.Services
                 {
                     c.Item().PaddingBottom(10);
                     c.Item().Text("Vérification en ligne :").Bold().FontColor(themeColor);
-                    c.Item().Text($"https://preuvetierce.fr/verify/{hash}").FontSize(10).Underline().FontColor(BleuPreuve);
+                    c.Item().Text($"https://preuvetierce.fr/?{serialNumber}").FontSize(10).Underline().FontColor(BleuPreuve);
                     c.Item().PaddingTop(5).Text("Ce document est généré automatiquement. PreuveTierce agit en tant que tiers de confiance technique").FontSize(9).FontColor(GrisClairLabel);
                 });
             });

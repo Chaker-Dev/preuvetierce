@@ -13,22 +13,28 @@ namespace PreuveTierce.Web.Controllers
         private readonly IPdfGeneratorService _pdfGeneratorService;
         private readonly IFileHasherService _fileHasherService;
         private readonly ILogger<DashboardController> _logger;
+        private readonly IAuditService _auditService;
+
         public DashboardController(
             ICertificationService certificationService,
             IPdfGeneratorService pdfGeneratorService,
             IFileHasherService fileHasherService,
-            ILogger<DashboardController> logger)
+            ILogger<DashboardController> logger,
+            IAuditService auditService)
         {
             _certificationService = certificationService;
             _pdfGeneratorService = pdfGeneratorService;
             _fileHasherService = fileHasherService;
             _logger = logger;
+            _auditService = auditService;
         }
         public async Task<IActionResult> Index()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
             _logger.LogInformation("Consultation du dashboard par l'utilisateur {UserId}", userId);
+
+            await _auditService.SaveLogAsync("DASHBOARD_VIEW", "N/A", "SUCCESS", HttpContext);
 
             try
             {
@@ -60,17 +66,19 @@ namespace PreuveTierce.Web.Controllers
                 if (certification == null)
                 {
                     _logger.LogWarning("Téléchargement échoué : Hash {Hash} introuvable (demandé par {UserId})", hash, userId);
+                    await _auditService.SaveLogAsync("DOWNLOAD_ATTESTATION", hash, "NOT_FOUND", HttpContext);
                     return NotFound("Certification introuvable.");
                 }
                 if (certification.OwnerId != userId)
                 {
                     _logger.LogCritical("ALERTE SÉCURITÉ : L'utilisateur {UserId} a tenté de télécharger un document appartenant à {OwnerId}. Hash: {Hash}",
                         userId, certification.OwnerId, hash);
+                    await _auditService.SaveLogAsync("DOWNLOAD_ATTESTATION_UNAUTHORIZED", hash, "FORBIDDEN", HttpContext);
                     return Forbid();
                 }
                 _logger.LogInformation("Génération de l'attestation de dépôt pour le document {SerialNumber}", certification.SerialNumber);
                 CertificateData pdfData = certification.ToCertificateData("https://preuvetierce.fr");
-
+                await _auditService.SaveLogAsync("DOWNLOAD_ATTESTATION", hash, "SUCCESS", HttpContext);
                 byte[] pdfBytes = _pdfGeneratorService.GenerateAttestation(pdfData);
 
                 string fileName = $"Attestation_{certification.SerialNumber}.pdf";
@@ -119,6 +127,7 @@ namespace PreuveTierce.Web.Controllers
                 if (existingDoc != null)
                 {
                     _logger.LogInformation("Tentative de double certification pour le hash {Hash}. Action bloquée.", fileHash);
+                    await _auditService.SaveLogAsync("UPLOAD_CERTIFICATION", fileHash, "DUPLICATE", HttpContext);
                     TempData["Warning"] = "Ce document a déjà été certifié !";
                     return RedirectToAction(nameof(Index));
                 }
@@ -137,7 +146,8 @@ namespace PreuveTierce.Web.Controllers
 
                 _logger.LogInformation("Enregistrement de la nouvelle certification : {SerialNumber}", newCertif.SerialNumber);
                 bool success = await _certificationService.RegisterCertificationAsync(newCertif);
-
+                await _auditService.SaveLogAsync("UPLOAD_CERTIFICATION", fileHash, success ? "SUCCESS" : "FAILURE", HttpContext);
+                
                 if (success)
                 {
                     _logger.LogInformation("Certification réussie et enregistrée en base pour {SerialNumber}", newCertif.SerialNumber);
@@ -154,6 +164,7 @@ namespace PreuveTierce.Web.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erreur technique lors de l'upload du fichier {FileName}", file.FileName);
+                await _auditService.SaveLogAsync("UPLOAD_CERTIFICATION", "UNKNOWN", "CRASH", HttpContext);
                 ModelState.AddModelError("", "Une erreur technique est survenue.");
                 return await Index();
             }

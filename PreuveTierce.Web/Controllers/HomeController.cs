@@ -42,11 +42,13 @@ namespace PreuveTierce.Web.Controllers
                 if (certification == null)
                 {
                     _logger.LogWarning("Recherche par Serial échouée : {Serial} introuvable en base.", serial);
+                    await _auditService.SaveLogAsync("VERIFY_BY_SERIAL", $"SERIAL:{serial}", "NOT_FOUND", HttpContext);
                     ViewBag.VerifyError = "Certificat introuvable";
                     return View();
                 }
 
                 _logger.LogInformation("Certificat trouvé via Serial. Hash associé : {Hash}", certification.Hash);
+                await _auditService.SaveLogAsync("VERIFY_BY_SERIAL", certification.Hash, "SUCCESS", HttpContext);
 
                 var model = new VerifyPresenceViewModel
                 {
@@ -125,10 +127,12 @@ namespace PreuveTierce.Web.Controllers
                 if (certification == null)
                 {
                     _logger.LogWarning("Téléchargement impossible : Aucun certificat pour le hash {Hash}", hash);
+                    await _auditService.SaveLogAsync("DOWNLOAD_PUBLIC_CERT", hash, "NOT_FOUND", HttpContext);
                     return NotFound("Aucune preuve d'authenticité n'existe pour ce document.");
                 }
-                _logger.LogInformation("Génération du certificat PDF en cours pour {Serial}...", certification.SerialNumber);
                 CertificateData pdfData = certification.ToCertificateData("https://preuvetierce.fr");
+                _logger.LogInformation("Génération du certificat PDF en cours pour {Serial}...", certification.SerialNumber);
+                await _auditService.SaveLogAsync("DOWNLOAD_PUBLIC_CERT", hash, "SUCCESS", HttpContext);
 
                 byte[] pdfBytes = _pdfGeneratorService.GenerateAuthenticCertification(pdfData);
 
@@ -141,6 +145,7 @@ namespace PreuveTierce.Web.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erreur lors de la génération/téléchargement du PDF pour le hash {Hash}", hash);
+                await _auditService.SaveLogAsync("DOWNLOAD_PUBLIC_CERT", hash, "ERROR_GENERATION", HttpContext);
                 return StatusCode(500, "Erreur lors de la génération du document.");
             }
         }

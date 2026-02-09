@@ -182,7 +182,7 @@ namespace PreuveTierce.Web.Services
                 {
                     c.Item().PaddingBottom(10);
                     c.Item().Text("Vérification en ligne :").Bold().FontColor(themeColor);
-                    c.Item().Text($"https://preuvetierce.fr/?{serialNumber}").FontSize(10).Underline().FontColor(BleuPreuve);
+                    c.Item().Text($"https://preuvetierce.fr/?serial={serialNumber}").FontSize(10).Underline().FontColor(BleuPreuve);
                     c.Item().PaddingTop(5).Text("Ce document est généré automatiquement. PreuveTierce agit en tant que tiers de confiance technique").FontSize(9).FontColor(GrisClairLabel);
                 });
             });

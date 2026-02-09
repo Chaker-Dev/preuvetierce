@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PreuveTierce.Web.Models;
 using PreuveTierce.Web.Services.Interfaces;
-using PreuveTierce.Web.ViewModels;
 using System.Security.Claims;
 
 namespace PreuveTierce.Web.Controllers
@@ -13,79 +12,113 @@ namespace PreuveTierce.Web.Controllers
         private readonly ICertificationService _certificationService;
         private readonly IPdfGeneratorService _pdfGeneratorService;
         private readonly IFileHasherService _fileHasherService;
+        private readonly ILogger<DashboardController> _logger;
         public DashboardController(
             ICertificationService certificationService,
-            IPdfGeneratorService  pdfGeneratorService,
-            IFileHasherService    fileHasherService)
+            IPdfGeneratorService pdfGeneratorService,
+            IFileHasherService fileHasherService,
+            ILogger<DashboardController> logger)
         {
             _certificationService = certificationService;
             _pdfGeneratorService = pdfGeneratorService;
             _fileHasherService = fileHasherService;
+            _logger = logger;
         }
         public async Task<IActionResult> Index()
         {
-            string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-            var history = await _certificationService.GetUserHistoryAsync(userId);
+            _logger.LogInformation("Consultation du dashboard par l'utilisateur {UserId}", userId);
 
-            return View(history);
+            try
+            {
+                var history = await _certificationService.GetUserHistoryAsync(userId);
+                _logger.LogDebug("Historique récupéré : {Count} documents pour l'utilisateur {UserId}", history.Count(), userId);
+                return View(history);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la récupération de l'historique pour {UserId}", userId);
+                return View(new List<CertifiedDocument>());
+            }
         }
         [HttpGet]
         public async Task<IActionResult> DownloadPdf(string hash)
         {
-            if (string.IsNullOrWhiteSpace(hash))
-                return BadRequest("Hash manquant.");
-
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-            var certification = await _certificationService.GetByHashAsync(hash);
+            if (string.IsNullOrWhiteSpace(hash))
+            {
+                _logger.LogWarning("Tentative de téléchargement sans hash par {UserId}", userId);
+                return BadRequest("Hash manquant.");
+            }
 
-            if (certification == null)
-                return NotFound("Certification introuvable.");
+            try
+            {
+                var certification = await _certificationService.GetByHashAsync(hash);
 
-            if (certification.OwnerId != userId)
-                return Forbid();
-            CertificateData pdfData = certification.ToCertificateData("https://preuvetierce.fr");
+                if (certification == null)
+                {
+                    _logger.LogWarning("Téléchargement échoué : Hash {Hash} introuvable (demandé par {UserId})", hash, userId);
+                    return NotFound("Certification introuvable.");
+                }
+                if (certification.OwnerId != userId)
+                {
+                    _logger.LogCritical("ALERTE SÉCURITÉ : L'utilisateur {UserId} a tenté de télécharger un document appartenant à {OwnerId}. Hash: {Hash}",
+                        userId, certification.OwnerId, hash);
+                    return Forbid();
+                }
+                _logger.LogInformation("Génération de l'attestation de dépôt pour le document {SerialNumber}", certification.SerialNumber);
+                CertificateData pdfData = certification.ToCertificateData("https://preuvetierce.fr");
 
-            byte[] pdfBytes = _pdfGeneratorService.GenerateAttestation(pdfData);
+                byte[] pdfBytes = _pdfGeneratorService.GenerateAttestation(pdfData);
 
-            string fileName = $"Attestation_{certification.SerialNumber}.pdf";
+                string fileName = $"Attestation_{certification.SerialNumber}.pdf";
 
-            return File(
-                pdfBytes,
-                "application/pdf",
-                fileName
-            );
+                return File(
+                    pdfBytes,
+                    "application/pdf",
+                    fileName
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors du téléchargement PDF pour le hash {Hash}", hash);
+                return StatusCode(500);
+            }
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(IFormFile? file, string reference)
         {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
             if (file == null || file.Length == 0)
             {
+                _logger.LogWarning("Upload annulé : Fichier vide ou nul par {UserId}", userId);
                 ModelState.AddModelError("", "Veuillez sélectionner un fichier valide.");
                 return await Index();
             }
 
             if (file.Length > 10 * 1024 * 1024)
             {
+                _logger.LogWarning("Fichier refusé : Taille trop grande ({Size} octets)", file.Length);
                 ModelState.AddModelError("", "Le fichier dépasse la taille limite de 10 Mo.");
                 return await Index();
             }
 
             try
             {
-                string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
-
                 string fileHash;
                 using (var stream = file.OpenReadStream())
                 {
                     fileHash = await _fileHasherService.ComputeSha256Async(stream);
                 }
-
+                _logger.LogInformation("Fichier haché avec succès : {Hash}", fileHash);
                 var existingDoc = await _certificationService.GetByHashAsync(fileHash);
                 if (existingDoc != null)
                 {
+                    _logger.LogInformation("Tentative de double certification pour le hash {Hash}. Action bloquée.", fileHash);
                     TempData["Warning"] = "Ce document a déjà été certifié !";
                     return RedirectToAction(nameof(Index));
                 }
@@ -102,23 +135,25 @@ namespace PreuveTierce.Web.Controllers
                     SerialNumber = $"PT-{DateTime.UtcNow.Year}-{fileHash.Substring(0, 8).ToUpper()}"
                 };
 
+                _logger.LogInformation("Enregistrement de la nouvelle certification : {SerialNumber}", newCertif.SerialNumber);
                 bool success = await _certificationService.RegisterCertificationAsync(newCertif);
 
                 if (success)
                 {
+                    _logger.LogInformation("Certification réussie et enregistrée en base pour {SerialNumber}", newCertif.SerialNumber);
                     TempData["Success"] = "Document certifié et horodaté avec succès.";
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    _logger.LogError("Échec de l'enregistrement en base de données pour le hash {Hash}", fileHash);
                     ModelState.AddModelError("", "Erreur lors de l'enregistrement de la certification.");
                     return await Index();
                 }
             }
             catch (Exception ex)
             {
-                // Log l'erreur réelle pour toi, mais affiche un message générique à l'utilisateur
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Erreur technique lors de l'upload du fichier {FileName}", file.FileName);
                 ModelState.AddModelError("", "Une erreur technique est survenue.");
                 return await Index();
             }

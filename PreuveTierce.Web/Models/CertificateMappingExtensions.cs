@@ -16,7 +16,7 @@
                 FileSizeFormatted = FormatFileSize(doc.FileSize),
                 ClientReference = doc.Reference,
                 FileHash = doc.Hash,
-                VerificationUrl = $"{verificationBaseUrl}/VerifyPresence/{doc.SerialNumber}"
+                VerificationUrl = $"{verificationBaseUrl}/?serial={doc.SerialNumber}"
             };
         }
 

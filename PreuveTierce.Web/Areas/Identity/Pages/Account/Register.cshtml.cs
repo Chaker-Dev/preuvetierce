@@ -2,23 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 using PreuveTierce.Web.Data;
+using PreuveTierce.Web.Services.Interfaces;
 
 namespace PreuveTierce.Web.Areas.Identity.Pages.Account
 {
@@ -110,48 +103,114 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+
+            ExternalLogins = (await _signInManager
+                .GetExternalAuthenticationSchemesAsync())
+                .ToList();
+
+            if (!ModelState.IsValid)
+                return Page();
+
+            var user = CreateUser();
+
+            await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+            await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+            var result = await _userManager.CreateAsync(user, Input.Password);
+
+            if (!result.Succeeded)
             {
-                var user = CreateUser();
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User created a new account with password.");
-
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
                 foreach (var error in result.Errors)
-                {
                     ModelState.AddModelError(string.Empty, error.Description);
-                }
+
+                return Page();
             }
 
-            // If we got this far, something failed, redisplay form
+            _logger.LogInformation(
+                "Nouvel utilisateur créé avec succès : {Email}",
+                Input.Email);
+
+            var userId = await _userManager.GetUserIdAsync(user);
+
+            var token = await _userManager
+                .GenerateEmailConfirmationTokenAsync(user);
+
+            token = WebEncoders.Base64UrlEncode(
+                Encoding.UTF8.GetBytes(token));
+
+            var callbackUrl = Url.Page(
+                "/Account/ConfirmEmail",
+                pageHandler: null,
+                values: new
+                {
+                    area = "Identity",
+                    userId,
+                    code = token,
+                    returnUrl
+                },
+                protocol: Request.Scheme);
+
+            var emailHtml = $@"
+        <div style='font-family:Arial,sans-serif;font-size:14px;color:#111'>
+            
+            <h2 style='color:#000091;margin-bottom:20px'>
+                Confirmation de votre adresse email
+            </h2>
+
+            <p>Bonjour,</p>
+
+            <p>
+                Merci d’avoir créé un compte sur <strong>PreuveTierce</strong>.
+            </p>
+
+            <p>
+                Pour activer votre compte, veuillez confirmer votre adresse email
+                en cliquant sur le bouton ci-dessous :
+            </p>
+
+            <p style='margin:30px 0'>
+                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'
+                   style='background:#000091;
+                          color:white;
+                          padding:12px 20px;
+                          text-decoration:none;
+                          border-radius:6px;
+                          font-weight:bold;'>
+                    Confirmer mon adresse email
+                </a>
+            </p>
+
+            <p style='font-size:12px;color:#555'>
+                Si vous n’êtes pas à l’origine de cette inscription,
+                vous pouvez ignorer cet email.
+            </p>
+
+            <hr style='margin:30px 0;border:none;border-top:1px solid #eee' />
+
+            <p style='font-size:11px;color:#888'>
+                PreuveTierce – Tiers de confiance numérique<br/>
+                Cet email est envoyé automatiquement, merci de ne pas y répondre.
+            </p>
+
+        </div>";
+
+            await _emailSender.SendEmailAsync(
+                Input.Email,
+                "Confirmation de votre compte PreuveTierce",
+                emailHtml);
+
+            _logger.LogInformation(
+                "Email de confirmation envoyé à {Email}",
+                Input.Email);
+
+            if (_userManager.Options.SignIn.RequireConfirmedAccount)
+            {
+                return RedirectToPage(
+                    "RegisterConfirmation",
+                    new { email = Input.Email, returnUrl });
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
             return Page();
         }
 

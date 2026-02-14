@@ -1,0 +1,27 @@
+﻿@page
+@{
+    ViewData["Title"] = "Compte déjà activé";
+}
+
+<div class="min-h-screen flex items-center justify-center bg-soft">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl text-center space-y-4">
+
+        <div class="text-4xl">✅</div>
+
+        <h1 class="text-xl font-bold">
+            Compte déjà activé
+        </h1>
+
+        <p class="text-sm text-gray-600">
+            Vous pouvez vous connecter dès maintenant.
+        </p>
+
+        <a asp-area="Identity"
+           asp-page="/Account/Login"
+           class="bg-primary text-white px-5 py-2 rounded-lg">
+            Se connecter
+        </a>
+
+    </div>
+</div>

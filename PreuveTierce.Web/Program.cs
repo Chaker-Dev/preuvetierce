@@ -45,11 +45,13 @@ namespace PreuveTierce.Web
 
                 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
                 {
-                    options.SignIn.RequireConfirmedAccount = false;
+                    options.SignIn.RequireConfirmedAccount = true;
                     options.Password.RequireDigit = true;
                     options.Password.RequiredLength = 8;
                     options.Password.RequireUppercase = true;
                     options.Password.RequireLowercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequiredUniqueChars = 1;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -64,6 +66,7 @@ namespace PreuveTierce.Web
                 builder.Services.AddScoped<ICertificationService, CertificationService>();
                 builder.Services.AddTransient<IQrCodeService, QrCodeService>();
                 builder.Services.AddTransient<IPdfGeneratorService, PdfGeneratorService>();
+                builder.Services.AddTransient<IEmailSender, BrevoEmailSender>();
                 builder.Services.AddScoped<IFileHasherService, FileHasherService>();
                 builder.Services.AddScoped<IAuditService, AuditService>();
 

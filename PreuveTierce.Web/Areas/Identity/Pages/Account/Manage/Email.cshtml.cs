@@ -2,17 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using PreuveTierce.Web.Data;
+using PreuveTierce.Web.Services.Interfaces;
 
 namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -92,7 +90,7 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID  '{_userManager.GetUserId(User)}'.");
             }
 
             await LoadAsync(user);
@@ -104,7 +102,7 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID '{_userManager.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)
@@ -112,8 +110,8 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
                 await LoadAsync(user);
                 return Page();
             }
-
             var email = await _userManager.GetEmailAsync(user);
+
             if (Input.NewEmail != email)
             {
                 var userId = await _userManager.GetUserIdAsync(user);
@@ -124,16 +122,59 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
                     pageHandler: null,
                     values: new { area = "Identity", userId = userId, email = Input.NewEmail, code = code },
                     protocol: Request.Scheme);
-                await _emailSender.SendEmailAsync(
-                    Input.NewEmail,
-                    "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                var subject = "Confirmation de changement d’adresse email – PreuveTierce";
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                var htmlMessage = $@"
+                    <div style='font-family:Arial,sans-serif;line-height:1.6'>
+                        <h2>Demande de modification de votre adresse email</h2>
+
+                        <p>Bonjour,</p>
+
+                        <p>
+                            Une demande de changement d’adresse email a été effectuée
+                            pour votre compte <strong>PreuveTierce</strong>.
+                        </p>
+
+                        <p>
+                            Nouvelle adresse demandée :
+                            <strong>{HtmlEncoder.Default.Encode(Input.NewEmail)}</strong>
+                        </p>
+
+                        <p>
+                            Pour confirmer cette modification, cliquez sur le bouton ci-dessous :
+                        </p>
+
+                        <p style='margin:30px 0'>
+                            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'
+                               style='background:#2563eb;
+                                      color:white;
+                                      padding:12px 20px;
+                                      text-decoration:none;
+                                      border-radius:6px;
+                                      font-weight:bold'>
+                                Confirmer le changement d’email
+                            </a>
+                        </p>
+
+                        <p style='font-size:13px;color:#b91c1c'>
+                            ⚠️ Si vous n’êtes pas à l’origine de cette demande,
+                            ignorez cet email et changez immédiatement votre mot de passe.
+                        </p>
+
+                        <hr/>
+
+                        <p style='font-size:12px;color:#999'>
+                            Horodatage : {DateTime.UtcNow:dd/MM/yyyy HH:mm} UTC<br/>
+                            IP estimée : {HttpContext.Connection.RemoteIpAddress}
+                        </p>
+                    </div>";
+
+                await _emailSender.SendEmailAsync(Input.NewEmail, subject, htmlMessage);
+                StatusMessage = "Un lien de confirmation a été envoyé à la nouvelle adresse email. \" +\r\n        \"La modification sera effective après validation.";
                 return RedirectToPage();
             }
 
-            StatusMessage = "Your email is unchanged.";
+            StatusMessage = "La nouvelle adresse email est identique à l’actuelle.";
             return RedirectToPage();
         }
 
@@ -142,7 +183,7 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID  '{_userManager.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)
@@ -160,12 +201,51 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
                 pageHandler: null,
                 values: new { area = "Identity", userId = userId, code = code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            var subject = "Confirmez votre adresse email – PreuveTierce";
+            var htmlMessage = $@"
+                    <div style='font-family:Arial,sans-serif;line-height:1.6'>
+                        <h2>Confirmation de votre adresse email</h2>
 
-            StatusMessage = "Verification email sent. Please check your email.";
+                        <p>Bonjour,</p>
+
+                        <p>
+                            Merci d’avoir créé un compte sur <strong>PreuveTierce</strong>.
+                        </p>
+
+                        <p>
+                            Pour activer votre espace sécurisé et finaliser votre inscription,
+                            veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :
+                        </p>
+
+                        <p style='margin:30px 0'>
+                            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'
+                               style='background:#2563eb;
+                                      color:white;
+                                      padding:12px 20px;
+                                      text-decoration:none;
+                                      border-radius:6px;
+                                      font-weight:bold'>
+                                Confirmer mon adresse email
+                            </a>
+                        </p>
+
+                        <p style='font-size:13px;color:#666'>
+                            Si vous n’êtes pas à l’origine de cette inscription,
+                            vous pouvez ignorer cet email.
+                        </p>
+
+                        <hr/>
+
+                        <p style='font-size:12px;color:#999'>
+                            Cet email a été envoyé automatiquement par PreuveTierce.<br/>
+                            Horodatage : {DateTime.UtcNow:dd/MM/yyyy HH:mm} UTC
+                        </p>
+                    </div>";
+
+            await _emailSender.SendEmailAsync(email, subject, htmlMessage);
+
+            StatusMessage = "Email de vérification envoyé. Veuillez consulter votre boîte de réception.";
+
             return RedirectToPage();
         }
     }

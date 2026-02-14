@@ -16,15 +16,12 @@ namespace PreuveTierce.Web.Data
             : base(options)
         {
         }
-
-        // Table pour les preuves (hash, timestamp, certificat)
         public DbSet<Proof> Proofs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            // Exemple de configuration pour la table Proofs
             builder.Entity<Proof>(entity =>
             {
                 entity.HasKey(p => p.Id);
@@ -34,8 +31,6 @@ namespace PreuveTierce.Web.Data
             });
         }
     }
-
-    // Modèle pour les preuves
     public class Proof
     {
         public int Id { get; set; }
@@ -43,8 +38,6 @@ namespace PreuveTierce.Web.Data
         public string? Reference { get; set; }
         public DateTime Timestamp { get; set; }
         public string? CertificateSerial { get; set; }
-
-        // Relation avec l'utilisateur (facultative)
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
     }

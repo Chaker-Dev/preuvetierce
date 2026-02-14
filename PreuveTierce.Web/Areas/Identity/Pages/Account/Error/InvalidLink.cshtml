@@ -1,0 +1,31 @@
+﻿@page
+@{
+    ViewData["Title"] = "Lien invalide";
+}
+
+<div class="min-h-screen flex items-center justify-center bg-soft px-4">
+
+    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl text-center space-y-6 border">
+
+        <div class="flex justify-center">
+            <div class="h-16 w-16 rounded-full bg-red-100 flex items-center justify-center">
+                ❌
+            </div>
+        </div>
+
+        <h1 class="text-xl font-bold text-gray-900">
+            Lien invalide
+        </h1>
+
+        <p class="text-sm text-gray-600">
+            Ce lien de confirmation est incorrect ou a déjà été utilisé.
+        </p>
+
+        <a asp-area="Identity"
+           asp-page="/Account/Register"
+           class="inline-block bg-primary text-white px-5 py-2.5 rounded-lg hover:bg-primary/90 transition">
+            Créer un compte
+        </a>
+
+    </div>
+</div>

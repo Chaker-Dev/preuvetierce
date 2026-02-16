@@ -40,7 +40,7 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Error
 
             await _emailSender.SendEmailAsync(
                 user.Email,
-                "Nouveau lien de confirmation",
+                "[PreuveTierce] Nouveau lien de confirmation",
                 $@"
             <h2>Confirmez votre compte</h2>
             <p>Votre précédent lien a expiré.</p>

@@ -122,7 +122,7 @@ namespace PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
                     pageHandler: null,
                     values: new { area = "Identity", userId = userId, email = Input.NewEmail, code = code },
                     protocol: Request.Scheme);
-                var subject = "Confirmation de changement d’adresse email – PreuveTierce";
+                var subject = "[PreuveTierce] Confirmation de changement d’adresse email";
 
                 var htmlMessage = $@"
                     <div style='font-family:Arial,sans-serif;line-height:1.6'>

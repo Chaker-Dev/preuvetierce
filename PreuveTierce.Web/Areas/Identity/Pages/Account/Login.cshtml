@@ -5,7 +5,7 @@
     ViewData["Title"] = "Connexion";
 }
 
-<div class="min-h-screen flex items-center justify-center">
+<div class="min-h-screen flex items-start justify-center mt-10">
     <div class="w-full max-w-md bg-white rounded-lg card-shadow p-8">
         <div class="text-center">
             <h1 class="text-2xl font-semibold text-primary mb-2">Connexion</h1>
@@ -57,7 +57,7 @@
                     @foreach (var provider in Model.ExternalLogins!)
                     {
                         <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                            <button type="submit" name="provider" value="@provider.Name" class="w-full border border-gray-300 rounded px-4 py-2 hover:bg-gray-100 transition text-sm font-medium">
+                            <button type="submit" name="provider" value="@provider.Name" class="w-full bg-primary cursor-pointer rounded px-4 py-2 hover:bg-blue-600 transition text-sm font-medium">
                                 Se connecter avec @provider.DisplayName
                             </button>
                         </form>

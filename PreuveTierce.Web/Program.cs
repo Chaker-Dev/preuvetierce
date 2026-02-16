@@ -53,7 +53,8 @@ namespace PreuveTierce.Web
                     options.Password.RequireNonAlphanumeric = true;
                     options.Password.RequiredUniqueChars = 1;
                 })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddErrorDescriber<FrenchIdentityErrorDescriber>(); 
 
                 builder.Host.UseSerilog((context, services, configuration) => configuration
                             .ReadFrom.Configuration(context.Configuration)
@@ -105,7 +106,7 @@ namespace PreuveTierce.Web
             finally
             {
                 Log.Information("Arrêt du serveur...");
-                Log.CloseAndFlush(); // ✨ Indispensable pour ne perdre aucun log
+                Log.CloseAndFlush(); 
             }
         }
     }

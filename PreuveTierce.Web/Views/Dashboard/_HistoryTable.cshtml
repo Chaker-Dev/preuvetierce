@@ -1,6 +1,6 @@
 ﻿@using PreuveTierce.Web.ViewModels
 @model List<CertifiedDocument>
-
+@if (Model != null && Model.Count > 0){
 <div class="bg-white rounded-lg card-shadow p-6 space-y-4">
 
     <div class="flex justify-between items-center">
@@ -121,3 +121,4 @@
     </div>
     }
 </div>
+}

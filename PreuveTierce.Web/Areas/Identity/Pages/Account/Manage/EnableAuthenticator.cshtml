@@ -1,0 +1,62 @@
+﻿@page
+@model EnableAuthenticatorModel
+@{
+    ViewData["Title"] = "Configurer l'authentification";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+    Layout = "_ManageLayout";
+}
+
+<div class="max-w-2xl space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">@ViewData["Title"]</h1>
+        <p class="text-gray-600">Sécurisez votre compte en trois étapes simples.</p>
+    </div>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <div class="space-y-10">
+        <div class="flex gap-4">
+            <span class="flex-none w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">1</span>
+            <div>
+                <h3 class="font-semibold text-gray-800">Téléchargement</h3>
+                <p class="text-sm text-gray-600">Téléchargez une application TOTP (Google Authenticator, Microsoft, Authy...).</p>
+            </div>
+        </div>
+
+        <div class="flex gap-4">
+            <span class="flex-none w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">2</span>
+            <div class="flex-1">
+                <h3 class="font-semibold text-gray-800 mb-4">Scan du Code QR</h3>
+
+                <div class="bg-white p-3 border rounded-xl inline-block shadow-sm mb-4">
+                    <img src="data:image/png;base64,@Model.QrCodeImageBase64" alt="QR Code" width="180" height="180" />
+                </div>
+
+                <div class="px-2 py-2 bg-gray-50 border border-dashed rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Clé manuelle :</p>
+                    <code class="text-blue-700 font-mono font-bold tracking-widest uppercase text-sm">@Model.SharedKey</code>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            <span class="flex-none w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">3</span>
+            <div class="flex-1">
+                <h3 class="font-semibold text-gray-800 mb-4">Vérification</h3>
+                <form method="post" class="max-w-xs space-y-4">
+                    <div asp-validation-summary="ModelOnly" class="text-xs text-red-500"></div>
+                    <div>
+                        <input asp-for="Input.Code" class="w-full px-4 py-3 border rounded-lg text-center font-mono text-xl tracking-widest focus:ring-2 focus:ring-blue-500 outline-none" placeholder="000 000" autocomplete="off" />
+                        <span asp-validation-for="Input.Code" class="text-xs text-red-500"></span>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition">
+                        Vérifier et activer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

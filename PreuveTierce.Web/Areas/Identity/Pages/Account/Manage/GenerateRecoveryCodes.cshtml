@@ -1,0 +1,72 @@
+﻿@page
+@using PreuveTierce.Web.Areas.Identity.Pages.Account.Manage
+@model GenerateRecoveryCodesModel
+@{
+    ViewData["Title"] = "Générer des codes de secours";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+    Layout = "_ManageLayout";
+}
+
+<section class="max-w-2xl">
+    <header class="mb-6">
+        <h1 class="text-xl font-semibold text-gray-800">@ViewData["Title"]</h1>
+    </header>
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    @if (Model.RecoveryCodes != null)
+    {
+        <div class="bg-blue-50 rounded p-6 mb-6">
+            <div class="flex items-center gap-3 mb-4 text-blue-800">
+                <i class="bi bi-info-circle-fill text-xl"></i>
+                <h2 class="font-bold text-lg">Conservez ces codes en lieu sûr !</h2>
+            </div>
+
+            <p class="text-sm text-blue-700 mb-6 leading-relaxed">
+                Si vous perdez l'accès à votre application d'authentification, ces codes seront l'unique moyen de récupérer votre compte <strong>PreuveTierce</strong>.
+                <span class="font-bold">Chaque code ne peut être utilisé qu'une seule fois.</span>
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                @foreach (var code in Model.RecoveryCodes)
+                {
+                    <div class="bg-white px-4 py-2 border rounded-lg font-mono text-center text-gray-800 shadow-sm tracking-widest uppercase">
+                        @code
+                    </div>
+                }
+            </div>
+
+            <div class="flex flex-wrap gap-3 mt-2">
+               @*  <button onclick="window.print()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition">
+                    <i class="bi bi-printer"></i> Imprimer
+                </button> *@
+                <a asp-page="./TwoFactorAuthentication" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                    J'ai bien noté mes codes
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4 text-yellow-800">
+                <i class="bi bi-exclamation-triangle-fill text-xl"></i>
+                <h2 class="font-bold text-lg">Action critique</h2>
+            </div>
+
+            <div class="space-y-4 text-sm text-yellow-800/80">
+                <p>
+                    La génération de nouveaux codes de secours <span class="font-bold text-yellow-900 underline">rendra vos codes actuels totalement inutilisables</span>.
+                </p>
+                <p>
+                    Si vous avez perdu votre téléphone ou si vos codes actuels ont été compromis, c'est la procédure recommandée.
+                </p>
+            </div>
+
+            <form method="post" class="mt-8">
+                <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-primary px-6 py-2.5 rounded-lg font-bold shadow-sm transition transform hover:-translate-y-0.5">
+                    Générer de nouveaux codes
+                </button>
+            </form>
+        </div>
+    }
+</section>

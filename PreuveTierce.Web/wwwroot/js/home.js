@@ -29,7 +29,9 @@ async function verifyPresence() {
 function downloadCertificate(hash) {
     window.location.href = `/Home/DownloadPublicCertificate?hash=${hash}`;
 }
-
+function downloadTimestamp(serial) {
+    window.location.href = `/Home/DownloadTimestamp?serial=${serial}`;
+}
 
 // --- GESTION DU DRAG & DROP ---
 
@@ -130,7 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </svg>
                     Télécharger l’attestation PDF
                 </button>
-
+                ${data.hasTimestampToken ? `
+                <button onclick="downloadTimestamp('${data.serial}')"
+                        class="cursor-pointer px-4 py-2 text-sm font-medium rounded-md
+                        border border-blue-300 text-blue-700 hover:bg-blue-50 transition">
+                    Télécharger le fichier d’horodatage (.tsr)
+                </button>
+                ` : ''}
                 <button onclick="window.location.reload()" class="cursor-pointer  text-sm text-gray-600 hover:text-primary underline">
                     Vérifier un autre document
                 </button>
@@ -164,13 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Calcul du Hash pour :", file.name);
             const hash = await computeSHA256(file);
             currentHash = hash;
-            console.log("Hash calculé :", hash);
             verifyBtn.disabled = false;
             btnText.textContent = "Vérifier l'authenticité";
             btnHint.textContent = "Empreinte générée : " + hash.substring(0, 15) + "...";
             btnHint.classList.add('text-primary');
-            // Ici, tu pourras appeler ton API de vérification avec ce hash
-            // verifyDocumentOnServer(hash);
         } catch (err) {
             console.error("Erreur de hachage:", err);
         }

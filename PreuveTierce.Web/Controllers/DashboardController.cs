@@ -12,6 +12,7 @@ namespace PreuveTierce.Web.Controllers
         private readonly ICertificationService _certificationService;
         private readonly IPdfGeneratorService _pdfGeneratorService;
         private readonly IFileHasherService _fileHasherService;
+        private readonly ITimestampService _stampService;
         private readonly ILogger<DashboardController> _logger;
         private readonly IAuditService _auditService;
 
@@ -20,13 +21,15 @@ namespace PreuveTierce.Web.Controllers
             IPdfGeneratorService pdfGeneratorService,
             IFileHasherService fileHasherService,
             ILogger<DashboardController> logger,
-            IAuditService auditService)
+            IAuditService auditService,
+            ITimestampService stampService)
         {
             _certificationService = certificationService;
             _pdfGeneratorService = pdfGeneratorService;
             _fileHasherService = fileHasherService;
             _logger = logger;
             _auditService = auditService;
+            _stampService = stampService;
         }
         public async Task<IActionResult> Index()
         {
@@ -118,10 +121,13 @@ namespace PreuveTierce.Web.Controllers
             try
             {
                 string fileHash;
+                byte[] hashBytes;
                 using (var stream = file.OpenReadStream())
                 {
+                    hashBytes = await _fileHasherService.ComputeSha256BytesAsync(stream);
                     fileHash = await _fileHasherService.ComputeSha256Async(stream);
                 }
+
                 _logger.LogInformation("Fichier haché avec succès : {Hash}", fileHash);
                 var existingDoc = await _certificationService.GetByHashAsync(fileHash);
                 if (existingDoc != null)
@@ -131,6 +137,9 @@ namespace PreuveTierce.Web.Controllers
                     TempData["Warning"] = "Ce document a déjà été certifié !";
                     return RedirectToAction(nameof(Index));
                 }
+                // 3. Appel au service d'horodatage (TSA)
+                _logger.LogInformation("Appel au service TSA pour le hash {Hash}", fileHash);
+                byte[] tsrToken = await _stampService.GetTimestampTokenAsync(hashBytes);
 
                 var newCertif = new CertifiedDocument
                 {
@@ -140,6 +149,7 @@ namespace PreuveTierce.Web.Controllers
                     FileSize = file.Length,
                     CertifiedAt = DateTime.UtcNow,
                     Status = "Certified",
+                    TimestampToken = tsrToken,
                     Reference = string.IsNullOrWhiteSpace(reference) ? $"DOC-{DateTime.UtcNow:yyyyMMdd-HHmmss}" : reference,
                     SerialNumber = $"PT-{DateTime.UtcNow.Year}-{fileHash.Substring(0, 8).ToUpper()}"
                 };

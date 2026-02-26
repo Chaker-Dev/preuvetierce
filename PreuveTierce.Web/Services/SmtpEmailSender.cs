@@ -5,11 +5,11 @@ using PreuveTierce.Web.Services.Interfaces;
 
 namespace PreuveTierce.Web.Services
 {
-    public class BrevoEmailSender : IEmailSender
+    public class SmtpEmailSender: IEmailSender
     {
         private readonly IConfiguration _config;
-        private readonly ILogger<BrevoEmailSender> _logger;
-        public BrevoEmailSender(IConfiguration config,ILogger<BrevoEmailSender> logger)
+        private readonly ILogger<SmtpEmailSender> _logger;
+        public SmtpEmailSender(IConfiguration config,ILogger<SmtpEmailSender> logger)
         {
             _config = config;
             _logger = logger;

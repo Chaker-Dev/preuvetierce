@@ -67,10 +67,10 @@ namespace PreuveTierce.Web
                 builder.Services.AddScoped<ICertificationService, CertificationService>();
                 builder.Services.AddTransient<IQrCodeService, QrCodeService>();
                 builder.Services.AddTransient<IPdfGeneratorService, PdfGeneratorService>();
-                builder.Services.AddTransient<IEmailSender, BrevoEmailSender>();
+                builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
                 builder.Services.AddScoped<IFileHasherService, FileHasherService>();
                 builder.Services.AddScoped<IAuditService, AuditService>();
-
+                builder.Services.AddHttpClient<ITimestampService, Rfc3161TimestampService>();
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.

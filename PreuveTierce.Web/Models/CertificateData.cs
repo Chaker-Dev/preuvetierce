@@ -11,5 +11,8 @@
         public DateTime DepositDateUtc { get; set; }
         public string FileHash { get; set; } = "";
         public string VerificationUrl { get; set; } = "";
+        public string TsaName { get; set; } = "";
+        public DateTime? TsaTimestamp { get; set; } 
+        public bool HasTimestampToken { get; set; }
     }
 }

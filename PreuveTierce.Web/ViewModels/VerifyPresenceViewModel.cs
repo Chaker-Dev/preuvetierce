@@ -1,4 +1,5 @@
-﻿namespace PreuveTierce.Web.ViewModels
+﻿
+namespace PreuveTierce.Web.ViewModels
 {
     public class VerifyPresenceViewModel
     {
@@ -8,6 +9,7 @@
         public long FileSizeBytes { get; set; }
         public string FileSizeFormatted { get; set; } = "";
         public string Hash { get; set; } = "";
+        public bool HasTimestampToken  {get; set; }
         public bool Exists { get; set; }
 
     }

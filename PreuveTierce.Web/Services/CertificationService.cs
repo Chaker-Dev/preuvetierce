@@ -27,7 +27,6 @@ namespace PreuveTierce.Web.Services
             DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
             if (!snapshot.Exists) return null;
-            var cc = MapToModel(snapshot); 
             return MapToModel(snapshot);
         }
 
@@ -45,6 +44,7 @@ namespace PreuveTierce.Web.Services
                     { "certificate_serial", document.SerialNumber },
                     { "reference ", document.Reference },
                     { "status", document.Status },
+                    { "TimestampToken", Blob.CopyFrom(document.TimestampToken) },
                     { "createdAt", Timestamp.FromDateTime(document.CertifiedAt.ToUniversalTime()) }
                 };
 
@@ -53,7 +53,6 @@ namespace PreuveTierce.Web.Services
             }
             catch (Exception ex)
             {
-                // TO DO injecter ILogger pour tracer l'erreur
                 Console.WriteLine($"Erreur Firestore : {ex.Message}");
                 return false;
             }
@@ -88,7 +87,8 @@ namespace PreuveTierce.Web.Services
                 Reference = doc.GetValue<string>("reference "),
                 Status = doc.GetValue<string>("status"),
                 OwnerId = doc.GetValue<string>("ownerId"),
-                CertifiedAt = doc.GetValue<Timestamp>("createdAt").ToDateTime()
+                CertifiedAt = doc.GetValue<Timestamp>("createdAt").ToDateTime(),
+                TimestampToken = doc.TryGetValue("TimestampToken", out Google.Protobuf.ByteString byteString) ? byteString.ToByteArray() : null
             };
         }
        

@@ -16,5 +16,11 @@ namespace PreuveTierce.Web.Services
                 return Convert.ToHexString(hashBytes).ToLowerInvariant();
             }
         }
+
+        public async Task<byte[]> ComputeSha256BytesAsync(Stream stream)
+        {
+            using var sha256 = SHA256.Create();
+            return await sha256.ComputeHashAsync(stream);
+        }
     }
 }

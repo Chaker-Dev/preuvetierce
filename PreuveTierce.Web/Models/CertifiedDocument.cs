@@ -11,5 +11,6 @@
         public string Reference { get; set; } = "";
         public string OwnerId { get; set; } = "";
         public string Status { get; set; } = "Certified";
+        public byte[]? TimestampToken { get; set; }
     }
 }

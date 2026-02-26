@@ -100,5 +100,19 @@
                 Vérifier l’authenticité
             </a>
         </div>
+        @if (Model.HasTimestampToken)
+        {
+            <p class="text-[11px] text-gray-400 mt-2">
+                Une preuve cryptographique RFC 3161 est disponible pour vérification indépendante.
+            </p>
+            <a asp-controller="Home"
+               asp-action="DownloadTimestamp"
+               asp-route-serial="@Model.CertificateSerial"
+               class="cursor-pointer px-4 py-2 text-sm font-medium rounded-md
+                  border border-blue-300 text-blue-700 hover:bg-blue-50 transition">
+
+                Télécharger le fichier d’horodatage (.tsr)
+            </a>
+        }
     </div>
 </div>

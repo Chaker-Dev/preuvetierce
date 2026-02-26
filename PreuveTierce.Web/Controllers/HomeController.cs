@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Tsp;
 using PreuveTierce.Web.Models;
 using PreuveTierce.Web.Services.Interfaces;
 using PreuveTierce.Web.ViewModels;
@@ -95,12 +96,14 @@ namespace PreuveTierce.Web.Controllers
                 {
                     return Ok(new { success = false, message = "Aucun certificat trouvé pour ce document." });
                 }
+                 bool HasTimestampToken = certif.TimestampToken != null && certif.TimestampToken.Length > 0;
                 return Ok(new
                 {
                     success = true,
                     fileName = certif.FileName,
                     date = certif.CertifiedAt.ToString("dd MMMM yyyy à HH:mm"),
                     serial = certif.SerialNumber,
+                    HasTimestampToken,
                     status = certif.Status
                 });
             }
@@ -148,6 +151,22 @@ namespace PreuveTierce.Web.Controllers
                 await _auditService.SaveLogAsync("DOWNLOAD_PUBLIC_CERT", hash, "ERROR_GENERATION", HttpContext);
                 return StatusCode(500, "Erreur lors de la génération du document.");
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> DownloadTimestamp(string serial)
+        {
+            var document = await _certificationService.GetBySerialAsync(serial);
+
+            if (document == null || document.TimestampToken == null)
+                return NotFound();
+
+            var fileName = $"{document.Reference}.tsr";
+
+            return File(
+                document.TimestampToken,
+                "application/timestamp-reply",
+                fileName
+            );
         }
         public IActionResult Privacy()
         {

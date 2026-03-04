@@ -1,100 +1,203 @@
-# PreuveTierce
+# 🛡️ PreuveTierce — Infrastructure de Confiance Numérique (SaaS-in-a-Box)
 
-**PreuveTierce** is a high-performance, lightweight digital evidence service designed to act as a neutral Technical Witness for document integrity.
-
-In an era where digital tampering is effortless, PreuveTierce provides a cryptographically secure method to prove that a document existed in a specific state at a specific point in time without ever compromising user privacy.
----
-
-## 🔐 The "Zero-Knowledge" Concept
-
-PreuveTierce solves the "Trust Gap" in digital transactions. We don't ask you to trust us with your files; we ask you to trust the mathematics of cryptography.
-
-PreuveTierce provides:
-- Proof of **existence:** Prove a file existed at a specific UTC second
-- Proof of **integrity:** Ensure not a single pixel or character has changed since timestamping.
-- Proof of **Zero-Storage Policy:** Your documents never leave your local environment. Only the 64-character SHA-256 hash (fingerprint) is transmitted to our vault.
-
-By recording only the document hash, PreuveTierce never stores the document itself.
+[![Framework - .NET 8](https://img.shields.io/badge/.NET-8.0-512bd4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![Security - Cloudflare](https://img.shields.io/badge/Security-Cloudflare_WAF-f38020?logo=cloudflare)](https://www.cloudflare.com/)
+[![Database - Firestore](https://img.shields.io/badge/Database-Firestore-ffca28?logo=firebase)](https://firebase.google.com/)
+[![Licence - Propriétaire](https://img.shields.io/badge/Licence-Propriétaire-red)]()
 
 ---
 
-## ⚙️ How it works
+## 📌 Résumé Exécutif
 
-1. The user uploads a document (or submits its hash).
-2. The system computes a cryptographic hash (SHA-256).
-3. The hash is recorded with:
-   - Timestamp (UTC)
-   - User identifier
-   - Unique certificate reference
-4. A PDF proof certificate is generated, including:
-   - Hash value
-   - Timestamp
-   - Unique reference
-   - QR Code for verification
+**PreuveTierce** est une solution complète de certification numérique et d’horodatage permettant de garantir l’intégrité et la preuve d’antériorité de documents numériques.
+
+Basée sur le standard **RFC 3161**, l’application adopte une architecture **Zero-Knowledge** stricte : seul le hachage cryptographique (SHA-256) d’un document est traité.  
+Les fichiers originaux ne sont jamais stockés ni conservés en clair sur le serveur.
+
+Cette approche garantit un haut niveau de confidentialité tout en assurant une valeur probatoire solide.
 
 ---
 
-## 🧱 Technical Stack (planned)
+## 🏗️ Architecture & Stack Technique
 
-- **Backend**: .NET (ASP.NET Core)
-- **Web**: MVC / Minimal API
-- **Database**: SQLite
-- **Web Server**: Nginx (reverse proxy)
-- **OS**: Ubuntu 22.04 LTS
-- **TLS**: Let's Encrypt TLS with A+ Security Rating.
-- **Hash Algorithm**: SHA-256
+L’infrastructure est conçue pour être scalable, sécurisée et exploitable en production.
 
----
-
-## 📦 Privacy by Design (GDPR+)
-
-- No document files are stored.
-- Only cryptographic hashes and metadata are recorded.
-- Designed to be compatible with GDPR principles (data minimization).
-
-> ⚠️ PreuveTierce is **not a certification authority** and does not claim legal qualification under eIDAS.
+| Couche | Technologie | Rôle |
+|--------|------------|------|
+| **Application** | ASP.NET Core 8 (Razor Pages) | Moteur web performant et sécurisé |
+| **Sécurité Edge** | Cloudflare (WAF, Rate Limiting, Proxy DNS) | Protection DDoS, filtrage IP, anti-bot |
+| **Base de données** | Google Cloud Firestore | Stockage NoSQL des métadonnées & identités |
+| **Horodatage (TSA)** | RFC 3161 (BouncyCastle) | Connexion aux autorités d’horodatage |
+| **Email Transactionnel** | AWS SES (SMTP sécurisé) | 2FA, confirmations, notifications |
+| **Génération PDF** | QuestPDF | Production d’attestations d’authenticité |
+| **Logs & Audit** | Serilog | Journalisation structurée et traçabilité |
+| **Hébergement** | Ubuntu 22.04 + Nginx + Systemd | Environnement Linux durci |
 
 ---
 
-## 🛡️ Legal Disclaimer
+## 🔐 Sécurité & Conformité
 
-[!IMPORTANT] PreuveTierce provides **technical evidence**, While built on international standards (similar to RFC 3161), it is currently a private technical service and not a "Qualified Trust Service Provider" (QTSP) under eIDAS.
+### Modèle Zero-Knowledge
 
-The legal value of the generated proof depends on:
-- Jurisdiction
-- Context of use
-- Judicial interpretation
+Le processus de certification suit cette séquence :
 
-Users remain responsible for how the evidence is used.
+1. Calcul du **hash SHA-256** en mémoire
+2. Envoi du hash à une Autorité d’Horodatage (TSA)
+3. Réception du jeton d’horodatage `.tsr`
+4. Stockage du jeton et des métadonnées uniquement
 
----
-
-## 🚀 Project Status
-
-- [x] Domain & VPS configured
-- [x] HTTPS (Let's Encrypt)
-- [ ] .NET backend implementation
-- [ ] SQLite integration
-- [ ] PDF certificate generation
-- [ ] Public verification endpoint
+Aucun document original n’est conservé sur le serveur.
 
 ---
 
-## 🧭 Roadmap
+### Sécurité Applicative
 
-- Phase 1: Minimal Proof API
-- Phase 2: User accounts
-- Phase 3: PDF certificate + QR verification
-- Phase 4: Public proof verification page
-
----
-
-## 👤 Author
-
-Project initiated and maintained by **Chaker Aich**.
+- Authentification multi-facteurs (validation email)
+- Limitation de débit sur endpoints sensibles (`/Login`, `/Upload`)
+- Journalisation complète des actions
+- Reverse proxy Nginx isolé
+- Protection Cloudflare WAF
+- Blocage des accès directs IP via firewall (UFW restreint aux plages Cloudflare)
 
 ---
 
-## 📄 License
+## 🚀 Déploiement en Production
 
-MIT License
+### Prérequis
+
+- VPS Ubuntu 22.04+
+- Runtime .NET 8 installé
+- Nginx configuré en reverse proxy
+- DNS Cloudflare activé
+- Firewall UFW configuré
+
+---
+
+### Gestion des Secrets
+
+Les identifiants sensibles ne doivent jamais être versionnés.
+
+Utiliser des variables d’environnement :
+
+```bash
+export EmailSettings__SmtpUser="VOTRE_USER_SMTP"
+export EmailSettings__SmtpPass="VOTRE_MDP_SMTP"
+export Tsa__Username=""
+export Tsa__Password=""
+```
+
+Ou via le service systemd :
+
+```
+Environment="EmailSettings__SmtpUser=..."
+Environment="EmailSettings__SmtpPass=..."
+```
+
+---
+
+### Exemple `appsettings.json` (Template Production)
+
+```json
+{
+  "Tsa": {
+    "Url": "https://freetsa.org/tsr"
+  },
+  "EmailSettings": {
+    "SmtpServer": "email-smtp.eu-west-3.amazonaws.com",
+    "SmtpPort": 587,
+    "SenderEmail": "contact@preuvetierce.com"
+  },
+  "Firebase": {
+    "ProjectId": "votre-projet-id"
+  }
+}
+```
+
+---
+
+### Configuration Firebase
+
+Un fichier de clé de service doit être présent sur le serveur :
+
+```
+firebase-auth.json
+```
+
+⚠️ Ce fichier est exclu du dépôt Git.
+
+---
+
+### Gestion du Service Linux
+
+```
+sudo systemctl status preuvetierce.service
+sudo systemctl restart preuvetierce.service
+sudo journalctl -u preuvetierce.service -f
+```
+
+---
+
+## 📂 Structure du Projet
+
+```
+/PreuveTierce
+├── /Pages
+├── /Services
+├── /Models
+├── /Helpers
+├── /wwwroot
+├── firebase-auth.json (exclu)
+├── appsettings.json
+└── Program.cs
+```
+
+---
+
+## 📈 Potentiel de Commercialisation
+
+PreuveTierce est conçu comme une infrastructure prête à être commercialisée.
+
+Modèles possibles :
+
+- SaaS B2B (LegalTech, industrie, conformité)
+- Licence marque blanche
+- API d’horodatage pour applications tierces
+- Déploiement on-premise pour environnements régulés
+
+---
+
+## 🧩 Transfert de Propriété
+
+Inclut :
+
+- Code source complet versionné
+- Documentation de déploiement
+- Assistance transfert infrastructure
+- Support technique de transition (15 jours)
+
+---
+
+## 📅 Informations Techniques
+
+Version architecture : Production v1  
+Statut : Opérationnel  
+Dernière mise à jour : 03/03/2026  
+
+---
+
+## ⚖️ Mentions Légales
+
+PreuveTierce est un logiciel propriétaire.  
+Toute reproduction ou revente sans autorisation est interdite.
+
+---
+
+## 🎯 Positionnement
+
+PreuveTierce constitue une brique d’infrastructure de confiance numérique permettant la certification et l’horodatage probatoire de documents dans des environnements sensibles.
+
+L’architecture permet une montée en charge horizontale et l’ouverture future d’API publiques.
+
+---
+
+**Fin du document**

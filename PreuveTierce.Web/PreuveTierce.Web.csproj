@@ -33,6 +33,13 @@
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
     <Folder Include="Services\helpers\" />
+    <Folder Include="wwwroot\fonts\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\fonts\DejaVuSans.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

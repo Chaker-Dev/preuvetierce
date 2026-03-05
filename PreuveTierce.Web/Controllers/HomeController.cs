@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Tsp;
 using PreuveTierce.Web.Models;
 using PreuveTierce.Web.Services.Interfaces;
 using PreuveTierce.Web.ViewModels;
@@ -8,6 +7,10 @@ using System.Diagnostics;
 
 namespace PreuveTierce.Web.Controllers
 {
+    /// <summary>
+    /// Contrôleur principal gérant l'accès public, la vérification d'authenticité 
+    /// et la récupération des preuves numériques (Certificats PDF et Jetons TSA).
+    /// </summary>
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -15,6 +18,9 @@ namespace PreuveTierce.Web.Controllers
         private readonly IPdfGeneratorService _pdfGeneratorService;
         private readonly IAuditService _auditService;
 
+        /// <summary>
+        /// Injection des dépendances pour les services de certification, de génération PDF et d'audit.
+        /// </summary>
         public HomeController(
             ILogger<HomeController> logger,
             ICertificationService certificationService,
@@ -26,6 +32,11 @@ namespace PreuveTierce.Web.Controllers
             _pdfGeneratorService = pdfGeneratorService;
             _auditService = auditService;
         }
+
+        /// <summary>
+        /// Page d'accueil et point d'entrée pour la vérification publique par numéro de série.
+        /// </summary>
+        /// <param name="serial">Numéro de série unique du certificat (optionnel).</param>
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Index(string? serial)
@@ -70,12 +81,20 @@ namespace PreuveTierce.Web.Controllers
                 return View();
             }
         }
+        /// <summary>
+        /// Formate la taille des fichiers pour une lecture humaine (KB/MB).
+        /// </summary>
         private string FormatFileSize(long bytes)
         {
             return bytes >= 1_000_000
                 ? $"{bytes / 1_000_000.0:F2} MB"
                 : $"{bytes / 1024.0:F2} KB";
         }
+        /// <summary>
+        /// Endpoint API permettant de vérifier l'existence d'une certification via son Hash (SHA-256).
+        /// Utilisé par le module de vérification "Drag & Drop" en façade.
+        /// </summary>
+        /// <param name="hash">Empreinte numérique du fichier à vérifier.</param>
         [HttpGet]
         public async Task<IActionResult> VerifyDocument(string hash)
         {
@@ -113,6 +132,12 @@ namespace PreuveTierce.Web.Controllers
                 return StatusCode(500);
             }
         }
+
+        /// <summary>
+        /// Génère et distribue le certificat d'authenticité au format PDF.
+        /// Ce document compile les preuves d'antériorité et d'intégrité.
+        /// </summary>
+        /// <param name="hash">Hash unique du document certifié.</param>
         [HttpGet]
         public async Task<IActionResult> DownloadPublicCertificate(string hash)
         {
@@ -152,6 +177,12 @@ namespace PreuveTierce.Web.Controllers
                 return StatusCode(500, "Erreur lors de la génération du document.");
             }
         }
+
+        /// <summary>
+        /// Permet de télécharger la preuve brute d'horodatage (Jeton TSR conforme RFC 3161).
+        /// Ce fichier est la preuve ultime opposable juridiquement devant un tribunal.
+        /// </summary>
+        /// <param name="serial">Numéro de série de la certification.</param>
         [HttpGet]
         public async Task<IActionResult> DownloadTimestamp(string serial)
         {
@@ -168,12 +199,19 @@ namespace PreuveTierce.Web.Controllers
                 fileName
             );
         }
+
+        /// <summary>
+        /// Affiche la politique de confidentialité (Nécessaire pour la conformité RGPD).
+        /// </summary>
         public IActionResult Privacy()
         {
             _logger.LogDebug("Consultation de la page Privacy.");
             return View();
         }
 
+        /// <summary>
+        /// Gestion centralisée des erreurs applicatives avec traçabilité via RequestID.
+        /// </summary>
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

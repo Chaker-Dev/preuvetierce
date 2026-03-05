@@ -1,0 +1,42 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Accès refusé";
+}
+
+<div class="min-h-screen flex items-start justify-center mt-10">
+    <div class="w-full max-w-md bg-white rounded-lg card-shadow p-8">
+
+        <div class="flex justify-center mb-4">
+            <svg class="h-16 w-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 20">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M12 9v2m0 4h.01M10.29 3.86l-7.1 12.3A1.5 1.5 0 004.5 18h15a1.5 1.5 0 001.31-2.24l-7.1-12.3a1.5 1.5 0 00-2.62 0z" />
+            </svg>
+        </div>
+
+        <h1 class="text-xl font-semibold text-gray-800 text-center">
+            Accès refusé
+        </h1>
+
+        <p class="text-sm text-gray-600 mt-3">
+            Vous n'avez pas l'autorisation d'accéder à cette ressource.
+            Si vous pensez qu'il s'agit d'une erreur, veuillez contacter l’administrateur.
+        </p>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <a asp-area=""
+               asp-controller="Home"
+               asp-action="Index"
+               class="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90 transition">
+                Retour à l’accueil
+            </a>
+
+            <a asp-area="Identity"
+               asp-page="/Account/Login"
+               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition">
+                Se connecter avec un autre compte
+            </a>
+        </div>
+
+    </div>
+</div>

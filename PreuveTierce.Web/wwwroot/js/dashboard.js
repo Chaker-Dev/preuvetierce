@@ -1,4 +1,26 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+﻿window.copyHash = async function (element, hash) {
+    try {
+        await navigator.clipboard.writeText(hash);
+
+        const span = element.querySelector("span");
+        if (!span) return;
+
+        const originalText = span.dataset.original || span.textContent;
+        span.dataset.original = originalText;
+
+        span.classList.add("bg-green-100", "text-green-700", "scale-105");
+        span.textContent = "Copié ✓";
+
+        setTimeout(() => {
+            span.textContent = span.dataset.original;
+            span.classList.remove("bg-green-100", "text-green-700", "scale-105");
+        }, 1200);
+
+    } catch (err) {
+        console.error("Clipboard error:", err);
+    }
+};
+document.addEventListener("DOMContentLoaded", () => {
 
     const tableBody = document.getElementById("tableBody");
     if (!tableBody) return;
@@ -29,11 +51,14 @@
             .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
             .forEach(r => r.style.display = "");
 
-        pageInfo.textContent = `Page ${currentPage} / ${totalPages || 1}`;
+        if (pageInfo)
+            pageInfo.textContent = `Page ${currentPage} / ${totalPages || 1}`;
 
-        // désactiver boutons
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+        if (prevBtn)
+            prevBtn.disabled = currentPage === 1;
+
+        if (nextBtn)
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
     }
 
     searchInput?.addEventListener("input", () => {

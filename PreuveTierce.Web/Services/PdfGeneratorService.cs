@@ -115,7 +115,7 @@ namespace PreuveTierce.Web.Services
                         .Padding(20)
                         .Row(row =>
                         {
-                            row.ConstantItem(60).AlignCenter().AlignMiddle().Text("✓").FontSize(50).FontColor(themeColor);
+                            row.ConstantItem(60).AlignCenter().AlignMiddle().Text("✓").FontFamily("DejaVu Sans").FontSize(50).FontColor(themeColor);
                             row.RelativeItem().PaddingLeft(20).Column(c =>
                             {
                                 c.Item().Text("Document Authentique & Intègre").FontSize(22).Bold().FontColor(OrFonce);
@@ -138,7 +138,6 @@ namespace PreuveTierce.Web.Services
                             });
                 }
 
-                // 3. Section HASH (Commune)
                 col.Item().PaddingBottom(10).Text("Empreinte Numérique (SHA-256)").FontSize(14).FontColor(themeColor).Bold();                 
 
                 col.Item().PaddingTop(10)
@@ -151,14 +150,12 @@ namespace PreuveTierce.Web.Services
                 col.Item().PaddingTop(5).PaddingBottom(30).Text("* ce code est unique au monde. la moindre modification d'un pixel ou d'une virgule dans le document original modifierait radicalement cette empreinte.")
                        .FontSize(9).FontColor(GrisClairLabel);
 
-                // 4. Tableau de Données (Commun)
                 col.Item().PaddingBottom(10).Text("Identification du Fichier").FontSize(14).FontColor(themeColor).Bold();
                   
                 col.Item().Table(table =>
                 {
                     table.ColumnsDefinition(cd => { cd.RelativeColumn(2); cd.RelativeColumn(3); });
 
-                    // Fonction locale pour styliser les lignes
                     void Row(string label, string value)
                     {
                         table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten3).PaddingVertical(10).Text(label).FontColor(GrisClairLabel);

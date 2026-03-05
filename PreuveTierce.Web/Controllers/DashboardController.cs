@@ -6,7 +6,12 @@ using System.Security.Claims;
 
 namespace PreuveTierce.Web.Controllers
 {
-    [Authorize]
+    /// <summary>
+    /// Contrôleur sécurisé gérant l'espace personnel de l'utilisateur.
+    /// Permet la gestion de l'historique, la certification de nouveaux documents
+    /// et l'accès aux preuves d'horodatage privées.
+    /// </summary>
+    [Authorize] // Accès restreint aux utilisateurs authentifiés (MFA recommandé en amont)
     public class DashboardController : Controller
     {
         private readonly ICertificationService _certificationService;
@@ -16,6 +21,9 @@ namespace PreuveTierce.Web.Controllers
         private readonly ILogger<DashboardController> _logger;
         private readonly IAuditService _auditService;
 
+        /// <summary>
+        /// Initialisation des services requis pour le pipeline de certification "Zero-Knowledge".
+        /// </summary>
         public DashboardController(
             ICertificationService certificationService,
             IPdfGeneratorService pdfGeneratorService,
@@ -31,6 +39,10 @@ namespace PreuveTierce.Web.Controllers
             _auditService = auditService;
             _stampService = stampService;
         }
+
+        /// <summary>
+        /// Affiche l'historique complet des certifications de l'utilisateur.
+        /// </summary>
         public async Task<IActionResult> Index()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -51,6 +63,12 @@ namespace PreuveTierce.Web.Controllers
                 return View(new List<CertifiedDocument>());
             }
         }
+
+        /// <summary>
+        /// Génère et télécharge une attestation de dépôt PDF.
+        /// Inclut une vérification stricte de propriété (Ownership check).
+        /// </summary>
+        /// <param name="hash">Hash unique du document certifié.</param>
         [HttpGet]
         public async Task<IActionResult> DownloadPdf(string hash)
         {
@@ -98,8 +116,15 @@ namespace PreuveTierce.Web.Controllers
                 return StatusCode(500);
             }
         }
+
+        /// <summary>
+        /// Point d'entrée du pipeline de certification.
+        /// Gère le hachage local, l'appel TSA (RFC 3161) et l'immuabilité en base.
+        /// </summary>
+        /// <param name="file">Fichier binaire envoyé par l'utilisateur.</param>
+        /// <param name="reference">Libellé personnalisé pour identifier le document.</param>
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] // Protection contre les attaques CSRF
         public async Task<IActionResult> Upload(IFormFile? file, string reference)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -125,6 +150,7 @@ namespace PreuveTierce.Web.Controllers
                 using (var stream = file.OpenReadStream())
                 {
                     hashBytes = await _fileHasherService.ComputeSha256BytesAsync(stream);
+                    stream.Position = 0;
                     fileHash = await _fileHasherService.ComputeSha256Async(stream);
                 }
 
@@ -137,7 +163,6 @@ namespace PreuveTierce.Web.Controllers
                     TempData["Warning"] = "Ce document a déjà été certifié !";
                     return RedirectToAction(nameof(Index));
                 }
-                // 3. Appel au service d'horodatage (TSA)
                 _logger.LogInformation("Appel au service TSA pour le hash {Hash}", fileHash);
                 byte[] tsrToken = await _stampService.GetTimestampTokenAsync(hashBytes);
 

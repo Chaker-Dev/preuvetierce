@@ -8,9 +8,12 @@ namespace PreuveTierce.Web.Services
     {
         private readonly FirestoreDb _db;
         private const string CollectionName = "Certifications";
-        public CertificationService(FirestoreDb db)
+        private readonly ILogger<CertificationService> _logger;
+
+        public CertificationService(FirestoreDb db, ILogger<CertificationService> logger)
         {
             _db = db;
+            _logger = logger;
         }
         public async Task<List<CertifiedDocument>> GetUserHistoryAsync(string userId)
         {
@@ -53,7 +56,7 @@ namespace PreuveTierce.Web.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur Firestore : {ex.Message}");
+                _logger.LogError(ex, "Erreur lors de l'enregistrement Firestore pour le document {Hash}", document.Hash);
                 return false;
             }
         }

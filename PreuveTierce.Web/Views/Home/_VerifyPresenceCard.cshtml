@@ -94,11 +94,11 @@
                 Imprimer la preuve
             </button>
 
-            <a href="#verify-integrity"
-               class="cursor-pointer px-4 py-2 text-sm font-medium rounded-md
-                      border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+            <button onclick="verifyFromCertificate('@Model.Hash')"
+                    class="cursor-pointer px-4 py-2 text-sm font-medium rounded-md
+               border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
                 Vérifier l’authenticité
-            </a>
+            </button>
         </div>
         @if (Model.HasTimestampToken)
         {
@@ -114,5 +114,29 @@
                 Télécharger le fichier d’horodatage (.tsr)
             </a>
         }
+    </div>
+</div>
+<div id="verifyModal"
+     class="fixed inset-0 z-50 hidden
+            flex items-center justify-center
+            bg-black/40 backdrop-blur-sm p-4">
+
+    <div class="bg-white rounded-xl shadow-xl
+                max-w-[50vw]
+                max-h-[80vh]
+                overflow-y-auto
+                p-6 relative">
+
+        <button onclick="closeVerifyModal()"
+                class="cursor-pointer absolute top-3 right-3 text-gray-400 hover:text-gray-700">
+            ✕
+        </button>
+
+        <h3 class="text-lg font-bold text-gray-800 mb-4">
+            Vérification du document
+        </h3>
+
+        <div id="verifyModalContent"></div>
+
     </div>
 </div>

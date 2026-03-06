@@ -75,23 +75,42 @@ Aucun document original n’est conservé sur le serveur.
 
 ### Gestion des Secrets
 
-Les identifiants sensibles ne doivent jamais être versionnés.
+Les identifiants sensibles ne doivent **jamais être stockés dans le dépôt Git** ni apparaître dans la documentation.
 
-Utiliser des variables d’environnement :
+Ils doivent être fournis par l’administrateur système lors du déploiement en production.
+
+Exemple de configuration via variables d’environnement :
 
 ```bash
-export EmailSettings__SmtpUser="VOTRE_USER_SMTP"
-export EmailSettings__SmtpPass="VOTRE_MDP_SMTP"
-export Tsa__Username=""
-export Tsa__Password=""
+export EmailSettings__SmtpUser="CONTACTER_ADMINISTRATEUR"
+export EmailSettings__SmtpPass="CONTACTER_ADMINISTRATEUR"
+export Tsa__Username="CONTACTER_ADMINISTRATEUR"
+export Tsa__Password="CONTACTER_ADMINISTRATEUR"
 ```
 
-Ou via le service systemd :
+Les valeurs réelles doivent être configurées uniquement par l’administrateur de l’infrastructure ou via un gestionnaire de secrets sécurisé.
+
+---
+
+### Configuration via Systemd
+
+Les variables peuvent également être injectées dans le service Linux :
 
 ```
-Environment="EmailSettings__SmtpUser=..."
-Environment="EmailSettings__SmtpPass=..."
+Environment="EmailSettings__SmtpUser=CONFIGURÉ_PAR_ADMINISTRATEUR"
+Environment="EmailSettings__SmtpPass=CONFIGURÉ_PAR_ADMINISTRATEUR"
+Environment="Tsa__Username=CONFIGURÉ_PAR_ADMINISTRATEUR"
+Environment="Tsa__Password=CONFIGURÉ_PAR_ADMINISTRATEUR"
 ```
+
+Dans un environnement de production, il est recommandé d’utiliser :
+
+- un **gestionnaire de secrets**
+- des **variables d’environnement système**
+- ou un **fichier sécurisé non versionné**
+
+afin d’éviter toute exposition accidentelle des identifiants.
+
 
 ---
 
@@ -99,18 +118,49 @@ Environment="EmailSettings__SmtpPass=..."
 
 ```json
 {
+  "ConnectionStrings": {
+    "DefaultConnection": "CONFIGURÉ_PAR_ADMINISTRATEUR"
+  },
   "Tsa": {
-    "Url": "https://freetsa.org/tsr"
+    "Url": "https://freetsa.org/tsr",
+    "Username": "",
+    "Password": ""
   },
   "EmailSettings": {
-    "SmtpServer": "email-smtp.eu-west-3.amazonaws.com",
-    "SmtpPort": 587,
-    "SenderEmail": "contact@preuvetierce.com"
+    "Server": "email-smtp.eu-west-1.amazonaws.com",
+    "Port": 587,
+    "SenderName": "PreuveTierce",
+    "SenderEmail": "no-reply@preuvetierce.fr",
+    "Username": "",
+    "Password": ""
   },
-  "Firebase": {
-    "ProjectId": "votre-projet-id"
-  }
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Seq" ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Seq",
+        "Args": { "serverUrl": "http://localhost:5341" }
+      },
+      { "Name": "Console" }
+    ],
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
 }
+
 ```
 
 ---
@@ -141,10 +191,14 @@ sudo journalctl -u preuvetierce.service -f
 
 ```
 /PreuveTierce
-├── /Pages
+├── /Views
 ├── /Services
-├── /Models
+├── /ViewModels
 ├── /Helpers
+├── /Models
+├── /Data
+├── /Controllers
+├── /Areas
 ├── /wwwroot
 ├── firebase-auth.json (exclu)
 ├── appsettings.json

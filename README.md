@@ -29,7 +29,7 @@ L’infrastructure est conçue pour être scalable, sécurisée et exploitable e
 | **Base de données** | Google Cloud Firestore | Stockage NoSQL des métadonnées & identités |
 | **Horodatage (TSA)** | RFC 3161 (BouncyCastle) | Connexion aux autorités d’horodatage |
 | **Email Transactionnel** | AWS SES (SMTP sécurisé) | 2FA, confirmations, notifications |
-| **Génération PDF** | QuestPDF | Production d’attestations d’authenticité |
+| **Génération PDF** | QuestPDF | Production d’attestations de dépôt / d’authenticité |
 | **Logs & Audit** | Serilog | Journalisation structurée et traçabilité |
 | **Hébergement** | Ubuntu 22.04 + Nginx + Systemd | Environnement Linux durci |
 
@@ -114,7 +114,7 @@ afin d’éviter toute exposition accidentelle des identifiants.
 
 ---
 
-### Exemple `appsettings.json` (Template Production)
+### `appsettings.json` (Template Production)
 
 ```json
 {
@@ -180,9 +180,9 @@ firebase-auth.json
 ### Gestion du Service Linux
 
 ```
-sudo systemctl status preuvetierce.service
-sudo systemctl restart preuvetierce.service
-sudo journalctl -u preuvetierce.service -f
+sudo systemctl status preuvetierce
+sudo systemctl restart preuvetierce
+sudo journalctl -u preuvetierce -f
 ```
 
 ---
@@ -194,7 +194,7 @@ sudo journalctl -u preuvetierce.service -f
 ├── /Views
 ├── /Services
 ├── /ViewModels
-├── /Helpers
+├── /Migrations
 ├── /Models
 ├── /Data
 ├── /Controllers
@@ -227,7 +227,7 @@ Inclut :
 - Code source complet versionné
 - Documentation de déploiement
 - Assistance transfert infrastructure
-- Support technique de transition (15 jours)
+- Support technique de transition (3 mois)
 
 ---
 
